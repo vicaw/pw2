@@ -1,5 +1,6 @@
 package dev.vicaw.resource;
 
+import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -11,8 +12,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import dev.vicaw.model.user.User;
+import dev.vicaw.model.user.UserCreateInput;
+import dev.vicaw.model.user.UserLoginInput;
 import dev.vicaw.service.UserService;
-import dev.vicaw.model.User;
 
 @Path("/api/users")
 public class UserResource {
@@ -21,7 +24,7 @@ public class UserResource {
     UserService userService;
 
     @GET
-    @Consumes(MediaType.APPLICATION_JSON)
+    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response list() {
         return Response.status(Status.OK).entity(userService.list()).build();
@@ -30,7 +33,15 @@ public class UserResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response save(@Valid User user) {
-        return Response.status(Status.OK).entity(userService.save(user)).build();
+    public Response save(@Valid UserCreateInput userInput) {
+        return Response.status(Status.OK).entity(userService.create(userInput)).build();
+    }
+
+    @POST
+    @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response login(@Valid UserLoginInput loginInput) {
+        return Response.status(Status.OK).entity(userService.login(loginInput)).build();
     }
 }

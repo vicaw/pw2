@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class Noticia {
-    private int id;
+    private long id;
     private String titulo;
     private String resumo;
     private String body;

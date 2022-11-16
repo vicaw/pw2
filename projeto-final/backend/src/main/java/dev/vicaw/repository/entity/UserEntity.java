@@ -1,4 +1,4 @@
-package dev.vicaw.model;
+package dev.vicaw.repository.entity;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +17,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
+import dev.vicaw.model.user.Role;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,11 +27,11 @@ import lombok.Setter;
 @Entity
 @Table(name = "Usuarios")
 @NoArgsConstructor
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     @Email
     @NotNull

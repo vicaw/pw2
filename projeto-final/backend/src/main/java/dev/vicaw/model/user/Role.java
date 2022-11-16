@@ -1,4 +1,4 @@
-package dev.vicaw.model;
+package dev.vicaw.model.user;
 
 public enum Role {
 
