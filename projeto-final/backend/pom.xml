@@ -69,7 +69,7 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-jwt</artifactId>
     </dependency>
-        <dependency>
+    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-jwt-build</artifactId>
     </dependency>
@@ -93,6 +93,11 @@
       <artifactId>mapstruct-processor</artifactId>
       <version>1.4.2.Final</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.slugify</groupId>
+      <artifactId>slugify</artifactId>
+      <version>3.0.2</version>
     </dependency>
   </dependencies>
   <build>

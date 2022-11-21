@@ -15,9 +15,10 @@ import io.smallrye.jwt.build.Jwt;
 import dev.vicaw.exception.EmailAlreadyExists;
 import dev.vicaw.model.user.Role;
 import dev.vicaw.model.user.User;
-import dev.vicaw.model.user.UserCreateInput;
-import dev.vicaw.model.user.UserLoginInput;
 import dev.vicaw.model.user.UserMapper;
+import dev.vicaw.model.user.input.UserCreateInput;
+import dev.vicaw.model.user.input.UserLoginInput;
+import dev.vicaw.model.user.output.UserLoginOutput;
 import dev.vicaw.repository.UserRepository;
 import dev.vicaw.repository.entity.UserEntity;
 
@@ -30,7 +31,6 @@ public class UserServiceImpl implements UserService {
     @Inject
     UserMapper userMapper;
 
-    @Transactional
     @Override
     public List<User> list() {
         return userMapper.toModelList(userRepository.listAll());
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public User create(UserCreateInput userInput) {
-        User user = new User(userInput);
+        User user = userMapper.toModel(userInput);
 
         if (userRepository.findByEmail(user.getEmail()).isPresent())
             throw new EmailAlreadyExists("An account with email address " + user.getEmail() + " already exists.");
@@ -50,13 +50,15 @@ public class UserServiceImpl implements UserService {
         UserEntity entity = userMapper.toEntity(user);
         userRepository.persist(entity);
 
-        return userMapper.toModel(entity);
+        user.setId(entity.getId());
+
+        return user;
 
     }
 
     @Transactional
     @Override
-    public User login(UserLoginInput loginInput) {
+    public UserLoginOutput login(UserLoginInput loginInput) {
         Optional<UserEntity> entity = userRepository.findByEmail(loginInput.getEmail());
 
         if (!entity.isPresent())
@@ -78,9 +80,9 @@ public class UserServiceImpl implements UserService {
                 .claim(Claims.email, user.getEmail())
                 .sign();
 
-        user.setToken(token);
+        UserLoginOutput userOutput = new UserLoginOutput(token, user);
 
-        return user;
+        return userOutput;
 
     }
 

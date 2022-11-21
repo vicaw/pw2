@@ -14,20 +14,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+import dev.vicaw.model.noticia.Noticia;
 import dev.vicaw.service.NoticiaService;
-import dev.vicaw.model.Noticia;
 
 @Path("/api/noticias")
 public class NoticiaResource {
 
     @Inject
-    NoticiaService noticiaController;
+    NoticiaService noticiaService;
 
     @GET
     // @RolesAllowed({ "USER" })
     @Produces(MediaType.APPLICATION_JSON)
     public Response list() {
-        return Response.status(Status.OK).entity(noticiaController.list()).build();
+        return Response.status(Status.OK).entity(noticiaService.list()).build();
     }
 
     @Path("/{noticiaId}")
@@ -35,14 +37,29 @@ public class NoticiaResource {
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getById(@PathParam("noticiaId") long noticiaId) {
-        System.out.println(noticiaId);
-        return Response.status(Status.OK).entity(noticiaController.getNoticiaById(noticiaId)).build();
+        return Response.status(Status.OK).entity(noticiaService.getById(noticiaId)).build();
+    }
+
+    @Path("/slugs/{noticiaSlug}")
+    @GET
+    @PermitAll
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getById(@PathParam("noticiaSlug") String noticiaSlug) {
+        return Response.status(Status.OK).entity(noticiaService.getBySlug(noticiaSlug)).build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response save(Noticia noticia) {
-        return Response.status(Status.OK).entity(noticiaController.save(noticia)).build();
+        return Response.status(Status.OK).entity(noticiaService.create(noticia)).build();
+    }
+
+    @Path("/feedinfo")
+    @GET
+    @PermitAll
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllFeedInfo() {
+        return Response.status(Status.OK).entity(noticiaService.getAllFeedInfo()).build();
     }
 }

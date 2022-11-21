@@ -13,8 +13,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import dev.vicaw.model.user.User;
-import dev.vicaw.model.user.UserCreateInput;
-import dev.vicaw.model.user.UserLoginInput;
+import dev.vicaw.model.user.input.UserCreateInput;
+import dev.vicaw.model.user.input.UserLoginInput;
 import dev.vicaw.service.UserService;
 
 @Path("/api/users")
@@ -44,4 +44,5 @@ public class UserResource {
     public Response login(@Valid UserLoginInput loginInput) {
         return Response.status(Status.OK).entity(userService.login(loginInput)).build();
     }
+
 }

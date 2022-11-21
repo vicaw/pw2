@@ -4,7 +4,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-//@Provider
+@Provider
 public class ExceptionHandler implements ExceptionMapper<Exception> {
 
     @Override
@@ -16,7 +16,7 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
         }
 
         if (exception instanceof EmailAlreadyExists) {
-            return Response.status(Response.Status.CONFLICT)
+            return Response.status(Response.Status.NOT_FOUND)
                     .entity(new ErrorResponseBody(exception.getMessage()))
                     .build();
         }

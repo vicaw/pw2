@@ -1,4 +1,4 @@
-package dev.vicaw.model.user;
+package dev.vicaw.model.user.input;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
