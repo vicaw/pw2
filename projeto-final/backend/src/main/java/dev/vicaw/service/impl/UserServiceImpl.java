@@ -19,8 +19,8 @@ import dev.vicaw.model.user.UserMapper;
 import dev.vicaw.model.user.input.UserCreateInput;
 import dev.vicaw.model.user.input.UserLoginInput;
 import dev.vicaw.model.user.output.UserLoginOutput;
+import dev.vicaw.model.user.output.UserRetrieveOutput;
 import dev.vicaw.repository.UserRepository;
-import dev.vicaw.repository.entity.UserEntity;
 
 @RequestScoped
 public class UserServiceImpl implements UserService {
@@ -32,13 +32,18 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
 
     @Override
-    public List<User> list() {
+    public List<UserRetrieveOutput> list() {
         return userMapper.toModelList(userRepository.listAll());
+    }
+
+    @Override
+    public UserRetrieveOutput getById(Long id) {
+        return userMapper.toModel(userRepository.findById(id));
     }
 
     @Transactional
     @Override
-    public User create(UserCreateInput userInput) {
+    public UserLoginOutput create(UserCreateInput userInput) {
         User user = userMapper.toModel(userInput);
 
         if (userRepository.findByEmail(user.getEmail()).isPresent())
@@ -47,19 +52,25 @@ public class UserServiceImpl implements UserService {
         user.setRole(Role.USER);
         user.setPassword(BcryptUtil.bcryptHash(user.getPassword()));
 
-        UserEntity entity = userMapper.toEntity(user);
-        userRepository.persist(entity);
+        userRepository.persist(user);
 
-        user.setId(entity.getId());
+        String token = Jwt
+                .issuer("http://localhost:8080")
+                .upn(user.getEmail())
+                .groups(user.getRole().toString())
+                .claim(Claims.full_name, user.getName())
+                .claim(Claims.sub, user.getId())
+                .sign();
 
-        return user;
+        UserLoginOutput loginOutput = new UserLoginOutput(token, userMapper.toModel(user));
+
+        return loginOutput;
 
     }
 
-    @Transactional
     @Override
     public UserLoginOutput login(UserLoginInput loginInput) {
-        Optional<UserEntity> entity = userRepository.findByEmail(loginInput.getEmail());
+        Optional<User> entity = userRepository.findByEmail(loginInput.getEmail());
 
         if (!entity.isPresent())
             throw new EmailAlreadyExists("Não existe nenhuma conta cadastrada com o email informado.");
@@ -67,17 +78,14 @@ public class UserServiceImpl implements UserService {
         if (!BcryptUtil.matches(loginInput.getPassword(), entity.get().getPassword()))
             throw new EmailAlreadyExists("Senha incorreta.");
 
-        User user = userMapper.toModel(entity.get());
-        user.setPassword(null);
-        user.setCreatedAt(null);
-        user.setUpdatedAt(null);
+        UserRetrieveOutput user = userMapper.toModel(entity.get());
 
         String token = Jwt
                 .issuer("http://localhost:8080")
                 .upn(user.getEmail())
                 .groups(user.getRole().toString())
                 .claim(Claims.full_name, user.getName())
-                .claim(Claims.email, user.getEmail())
+                .claim(Claims.sub, user.getId().toString())
                 .sign();
 
         UserLoginOutput userOutput = new UserLoginOutput(token, user);

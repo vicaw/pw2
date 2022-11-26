@@ -4,7 +4,7 @@ import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
-import dev.vicaw.repository.entity.UserEntity;
+import dev.vicaw.model.user.User;
 
 import java.util.List;
 

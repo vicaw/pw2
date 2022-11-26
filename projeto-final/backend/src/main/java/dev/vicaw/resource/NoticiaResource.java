@@ -36,13 +36,12 @@ public class NoticiaResource {
     @GET
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getById(@PathParam("noticiaId") long noticiaId) {
+    public Response getById(@PathParam("noticiaId") Long noticiaId) {
         return Response.status(Status.OK).entity(noticiaService.getById(noticiaId)).build();
     }
 
     @Path("/slugs/{noticiaSlug}")
     @GET
-    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getById(@PathParam("noticiaSlug") String noticiaSlug) {
         return Response.status(Status.OK).entity(noticiaService.getBySlug(noticiaSlug)).build();

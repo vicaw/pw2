@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 // @RegisterForReflection
 public class NoticiaListFeedOutput {
-    private long id;
+    private Long id;
     private String slug;
     private String chapeu_feed;
     private String titulo_feed;

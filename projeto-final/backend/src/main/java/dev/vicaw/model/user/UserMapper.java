@@ -5,24 +5,30 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
 import dev.vicaw.model.user.input.UserCreateInput;
-import dev.vicaw.repository.entity.UserEntity;
+import dev.vicaw.model.user.input.UserLoginInput;
+import dev.vicaw.model.user.output.UserBasicOutput;
+import dev.vicaw.model.user.output.UserRetrieveOutput;
 
 import java.util.List;
 
 @Mapper(componentModel = "cdi")
 public interface UserMapper {
 
-    List<User> toModelList(List<UserEntity> entities);
+    List<UserRetrieveOutput> toModelList(List<User> entities);
 
-    User toModel(UserEntity entity);
+    UserRetrieveOutput toModel(User entity);
+
+    UserBasicOutput toUserBasicOutput(User user);
 
     User toModel(UserCreateInput input);
 
-    @InheritInverseConfiguration(name = "toModel")
-    UserEntity toEntity(User domain);
+    UserLoginInput toLoginInput(User user);
 
-    void updateEntityFromModel(User model, @MappingTarget UserEntity entity);
+    // @InheritInverseConfiguration(name = "toModel")
+    // UserEntity toEntity(User domain);
 
-    void updateModelFromEntity(UserEntity entity, @MappingTarget User model);
+    // void updateEntityFromModel(User model, @MappingTarget UserEntity entity);
+
+    // void updateModelFromEntity(UserEntity entity, @MappingTarget User model);
 
 }

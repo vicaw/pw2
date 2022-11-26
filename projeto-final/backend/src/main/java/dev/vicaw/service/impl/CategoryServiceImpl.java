@@ -29,7 +29,6 @@ import dev.vicaw.model.user.input.UserLoginInput;
 import dev.vicaw.model.user.output.UserLoginOutput;
 import dev.vicaw.repository.CategoryRepository;
 import dev.vicaw.repository.UserRepository;
-import dev.vicaw.repository.entity.UserEntity;
 
 @RequestScoped
 public class CategoryServiceImpl implements CategoryService {
@@ -47,7 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Noticia> listCategoryArticlesById(long categoryId) {
+    public List<Noticia> listCategoryArticlesById(Long categoryId) {
         return categoryRepository.findById(categoryId).getNoticias();
     }
 

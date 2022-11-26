@@ -9,7 +9,7 @@ public interface NoticiaService {
 
     public List<Noticia> list();
 
-    public Noticia getById(long id);
+    public Noticia getById(Long id);
 
     public Noticia create(Noticia noticia);
 

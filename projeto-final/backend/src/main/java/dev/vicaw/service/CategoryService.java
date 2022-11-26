@@ -11,7 +11,7 @@ public interface CategoryService {
 
     public Category create(CategoryCreateInput input);
 
-    public List<Noticia> listCategoryArticlesById(long categoryId);
+    public List<Noticia> listCategoryArticlesById(Long categoryId);
 
     public List<Noticia> listCategoryArticlesBySlug(String categorySlug);
 }

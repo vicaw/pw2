@@ -38,14 +38,11 @@ public class NoticiaServiceImpl implements NoticiaService {
     }
 
     @Override
-    public Noticia getById(long id) {
+    public Noticia getById(Long id) {
         // Noticia entity = noticiaRepository.findById(id);
         // Noticia noticia = noticiaMapper.toModel(entity);
 
         Noticia noticia = noticiaRepository.findById(id);
-
-        if (jwt.getClaimNames() == null)
-            noticia.setBody("Registre-se para ver esse conteúdo.");
 
         return noticia;
     }

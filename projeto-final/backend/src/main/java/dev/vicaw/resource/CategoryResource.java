@@ -40,7 +40,7 @@ public class CategoryResource {
     @GET
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getArticlesById(@PathParam("categoryId") long categoryId) {
+    public Response getArticlesById(@PathParam("categoryId") Long categoryId) {
         return Response.status(Status.OK).entity(categoryService.listCategoryArticlesById(categoryId)).build();
     }
 
