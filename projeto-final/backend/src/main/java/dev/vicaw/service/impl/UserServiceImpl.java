@@ -12,7 +12,7 @@ import org.eclipse.microprofile.jwt.Claims;
 import dev.vicaw.service.UserService;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.smallrye.jwt.build.Jwt;
-import dev.vicaw.exception.EmailAlreadyExists;
+import dev.vicaw.exception.ApiException;
 import dev.vicaw.model.user.Role;
 import dev.vicaw.model.user.User;
 import dev.vicaw.model.user.UserMapper;
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toModel(userInput);
 
         if (userRepository.findByEmail(user.getEmail()).isPresent())
-            throw new EmailAlreadyExists("An account with email address " + user.getEmail() + " already exists.");
+            throw new ApiException(409, "O e-mail informado já está cadastrado.");
 
         user.setRole(Role.USER);
         user.setPassword(BcryptUtil.bcryptHash(user.getPassword()));
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
                 .upn(user.getEmail())
                 .groups(user.getRole().toString())
                 .claim(Claims.full_name, user.getName())
-                .claim(Claims.sub, user.getId())
+                .claim(Claims.sub, user.getId().toString())
                 .sign();
 
         UserLoginOutput loginOutput = new UserLoginOutput(token, userMapper.toModel(user));
@@ -73,10 +73,10 @@ public class UserServiceImpl implements UserService {
         Optional<User> entity = userRepository.findByEmail(loginInput.getEmail());
 
         if (!entity.isPresent())
-            throw new EmailAlreadyExists("Não existe nenhuma conta cadastrada com o email informado.");
+            throw new ApiException(401, "Seu usuário ou senha estão incorretos.");
 
         if (!BcryptUtil.matches(loginInput.getPassword(), entity.get().getPassword()))
-            throw new EmailAlreadyExists("Senha incorreta.");
+            throw new ApiException(401, "Seu usuário ou senha estão incorretos.");
 
         UserRetrieveOutput user = userMapper.toModel(entity.get());
 

@@ -2,22 +2,22 @@ package dev.vicaw.service;
 
 import java.util.List;
 
-import dev.vicaw.model.comment.Comment;
 import dev.vicaw.model.comment.input.PostCommentInput;
+import dev.vicaw.model.comment.output.ArticleCommentsOutput;
 import dev.vicaw.model.comment.output.CommentOutput;
-import dev.vicaw.model.noticia.Noticia;
-import dev.vicaw.model.noticia.output.NoticiaListFeedOutput;
 
 public interface CommentService {
 
-    public List<Comment> list();
+    public List<CommentOutput> list();
 
-    public List<CommentOutput> getArticleComments(Long id);
+    public ArticleCommentsOutput getArticleComments(Long id, int page);
 
-    public Comment getById(Long id);
+    public CommentOutput getById(Long id);
 
     public CommentOutput create(PostCommentInput commentInput);
 
-    public List<Comment> getChildren(Long id);
+    public void delete(Long id);
+
+    // public List<Comment> getChildren(Long id);
 
 }

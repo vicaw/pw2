@@ -1,7 +1,7 @@
 import React from "react";
 import { NoticiaCardType } from "../types/noticia";
 import NoticiaCard from "../components/server/ArticleFeed/articlecard";
-import Header from "../components/client/Header/header";
+import Header from "../components/client/header/header";
 import { CategoryType } from "../types/category";
 import { AuthProvider } from "../contexts/AuthContext";
 import { api } from "../services/api";

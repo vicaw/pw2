@@ -1,6 +1,6 @@
 import "../styles/globals.css";
 import { CategoryType } from "../types/category";
-import Header from "../components/client/Header/header";
+import Header from "../components/client/header/header";
 import Providers from "./providers";
 
 const fetchCategories = async () => {

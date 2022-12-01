@@ -19,6 +19,6 @@ export type CommentType = {
 export type PostCommentType = {
     articleId: string;
     authorId?: string;
-    parentId?: string;
+    parentId?: string | null;
     body: string;
   };

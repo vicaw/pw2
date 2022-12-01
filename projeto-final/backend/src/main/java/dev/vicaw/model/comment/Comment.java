@@ -44,21 +44,21 @@ public class Comment {
     private Long id;
 
     @JoinColumn(name = "noticia_id", insertable = false, updatable = false)
-    @ManyToOne(targetEntity = Noticia.class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Noticia.class, fetch = FetchType.LAZY)
     private Noticia noticia;
 
     @Column(name = "noticia_id")
     private Long articleId;
 
     @JoinColumn(name = "author_id", insertable = false, updatable = false)
-    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
     private User author;
 
     @Column(name = "author_id")
     private Long authorId;
 
     @JoinColumn(name = "parent_id", insertable = false, updatable = false)
-    @ManyToOne(targetEntity = Comment.class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Comment.class, fetch = FetchType.LAZY)
     private Comment parentComment;
 
     @Column(name = "parent_id")
@@ -68,7 +68,6 @@ public class Comment {
     private String body;
 
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<Comment> children;
 
     @CreationTimestamp

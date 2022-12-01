@@ -4,38 +4,31 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-//@Provider
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Provider
 public class ExceptionHandler implements ExceptionMapper<Exception> {
 
     @Override
     public Response toResponse(Exception exception) {
-        if (exception instanceof UserNotFoundException) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity(new ErrorResponseBody(exception.getMessage()))
-                    .build();
-        }
-
-        if (exception instanceof EmailAlreadyExists) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity(new ErrorResponseBody(exception.getMessage()))
+        if (exception instanceof ApiException) {
+            ApiException e = (ApiException) exception;
+            return Response.status(Response.Status.fromStatusCode(e.getCode()))
+                    .entity(new ErrorResponseBody(e.getCode(), e.getMessage()))
                     .build();
         }
 
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(new ErrorResponseBody("Something unexpected happened. Try again"))
+                .entity(new ErrorResponseBody(500, "Something unexpected happened. Try again"))
                 .build();
     }
 
+    @Data
     public static final class ErrorResponseBody {
 
+        private final int code;
         private final String message;
 
-        public ErrorResponseBody(String message) {
-            this.message = message;
-        }
-
-        public String getMessage() {
-            return message;
-        }
     }
 }

@@ -20,9 +20,3 @@ export type NoticiaType = {
     createdAt: string;
     category: CategoryType;
   };
-
-  export type UserType = {
-    id: string;
-    name: string;
-    email: string;
-  };

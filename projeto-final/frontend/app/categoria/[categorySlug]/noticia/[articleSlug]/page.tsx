@@ -6,7 +6,7 @@ import { NoticiaType } from "../../../../../types/noticia";
 import parse from "html-react-parser";
 import moment from "moment";
 import { notFound } from "next/navigation";
-import CommentArea from "../../../../../components/comments/commentarea";
+import CommentArea from "../../../../../components/client/comments/commentarea";
 
 const fetchArticles = async (slug: string) => {
   const data: NoticiaType = await fetch(

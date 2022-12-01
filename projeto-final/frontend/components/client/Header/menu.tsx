@@ -12,6 +12,10 @@ import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { InferGetStaticPropsType } from "next";
 import { CategoryType } from "../../../types/category";
 import { AuthContext } from "../../../contexts/AuthContext";
+import {
+  MODAL_TYPES,
+  useGlobalModalContext,
+} from "../../../contexts/ModalContext";
 
 //???????????????????????
 
@@ -22,7 +26,13 @@ interface Props {
 function Menu({ categories }: Props) {
   const [layer, setLayer] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+
   const { signOut, isAuthenticated, user } = useContext(AuthContext);
+  const { showModal } = useGlobalModalContext();
+
+  const loginModal = () => {
+    showModal(MODAL_TYPES.LOGIN_MODAL);
+  };
 
   const navRef = useRef<HTMLDivElement>(null);
 
@@ -103,7 +113,7 @@ function Menu({ categories }: Props) {
             <div>
               {isAuthenticated ? (
                 <div>
-                  <div className="flex">
+                  <div className="flex gap-3">
                     <svg
                       width="20"
                       height="20"
@@ -112,48 +122,61 @@ function Menu({ categories }: Props) {
                     >
                       <path
                         d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"
-                        fill-rule="nonzero"
+                        fillRule="nonzero"
                         fill="#333"
                       ></path>
                     </svg>
-                    <span>{user?.name}</span>
+                    <span className="leading-none tracking-tighter text-xl font-bold text-gray-700">
+                      {user?.name}
+                    </span>
                   </div>
-                  <div className="flex">
+                  <button
+                    onClick={signOut}
+                    className="flex mt-5 gap-3 hover:text-red-600 hover:fill-red-600 text-gray-700"
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="18"
                       height="18"
                       viewBox="0 0 18 18"
                     >
-                      <g fill="none" fill-rule="evenodd">
+                      <g fill="none" fillRule="evenodd">
                         <path d="M-2-2h20v20H-2z"></path>
                         <path
                           fill="#999"
-                          fill-rule="nonzero"
+                          fillRule="nonzero"
                           d="M6.408 10.992l1.175 1.175L11.75 8 7.583 3.833 6.408 5.008l2.15 2.159H.5v1.666h8.058l-2.15 2.159zM13.833.5H2.167C1.242.5.5 1.25.5 2.167V5.5h1.667V2.167h11.666v11.666H2.167V10.5H.5v3.333c0 .917.742 1.667 1.667 1.667h11.666c.917 0 1.667-.75 1.667-1.667V2.167C15.5 1.25 14.75.5 13.833.5z"
                         ></path>
                       </g>
                     </svg>
-                    <button onClick={signOut}>Sign Out</button>
-                  </div>
+                    <span className="leading-none tracking-tighter text-base font-thin">
+                      sair da conta
+                    </span>
+                  </button>
                 </div>
               ) : (
-                <div className="flex">
+                <div className="flex gap-3 cursor-pointer" onClick={loginModal}>
                   <svg
                     width="20"
                     height="20"
                     viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg"
+                    className="mt-1"
                   >
                     <path
                       d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"
-                      fill-rule="nonzero"
+                      fillRule="nonzero"
                       fill="#999"
                     ></path>
                   </svg>
-                  <Link href={"/login"} onClick={() => setIsOpen(!isOpen)}>
-                    Faça Login
-                  </Link>
+                  <div>
+                    <span className="block text-base font-bold tracking-tighter text-red-700 leading-none">
+                      acesse sua conta
+                    </span>
+                    <span className="block text-xs tracking-tighter text-gray-600">
+                      ou cadastre-se grátis
+                    </span>
+                  </div>
                 </div>
               )}
             </div>

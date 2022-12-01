@@ -15,8 +15,7 @@ import dev.vicaw.service.CategoryService;
 import dev.vicaw.service.UserService;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.smallrye.jwt.build.Jwt;
-import dev.vicaw.exception.EmailAlreadyExists;
-import dev.vicaw.model.category.Category;
+import dev.vicaw.exception.ApiException;
 import dev.vicaw.model.category.Category;
 import dev.vicaw.model.category.CategoryMapper;
 import dev.vicaw.model.category.input.CategoryCreateInput;
@@ -54,7 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<Noticia> listCategoryArticlesBySlug(String categorySlug) {
         Optional<Category> category = categoryRepository.findBySlug(categorySlug);
         if (!category.isPresent())
-            throw new EmailAlreadyExists("This category doesn't exist.");
+            throw new ApiException(404, "Essa categoria não existe.");
 
         return category.get().getNoticias();
     }
@@ -69,7 +68,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setSlug(slug);
 
         if (categoryRepository.findBySlug(category.getSlug()).isPresent())
-            throw new EmailAlreadyExists("The category named " + category.getName() + " already exists.");
+            throw new ApiException(409, "A categoria com o nome '" + category.getName() + "' já existe.");
 
         categoryRepository.persist(category);
 

@@ -1,11 +1,9 @@
 import { createContext, useEffect, useState } from "react";
 import { setCookie, parseCookies, destroyCookie } from "nookies";
-import Router from "next/router";
 
 import { recoverUserInformation, signInRequest } from "../services/auth";
 import { api } from "../services/api";
-import { UserType } from "../types/noticia";
-import { ServerStreamFileResponseOptionsWithError } from "http2";
+import { UserType } from "../types/";
 
 type SignInData = {
   email: string;
@@ -48,16 +46,19 @@ export function AuthProvider({ children }: any) {
       console.log(parsedToken);
       recoverUserInformation(parsedToken.sub).then((response) => {
         setUser(response);
-        console.log(user);
       });
     }
   }, []);
 
   async function signIn({ email, password }: SignInData) {
-    const data: LoginResponse = await signInRequest({
+    const data = await signInRequest({
       email,
       password,
-    });
+    })
+      .then((res) => res)
+      .catch((err) => {
+        throw err.response.data.message;
+      });
 
     const token = data.token;
     const user = data.user;
