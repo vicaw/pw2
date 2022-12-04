@@ -1,5 +1,6 @@
 package dev.vicaw.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,20 +15,18 @@ import com.github.slugify.Slugify;
 import dev.vicaw.service.CategoryService;
 import dev.vicaw.service.UserService;
 import io.quarkus.elytron.security.common.BcryptUtil;
+import io.quarkus.panache.common.Page;
 import io.smallrye.jwt.build.Jwt;
 import dev.vicaw.exception.ApiException;
 import dev.vicaw.model.category.Category;
 import dev.vicaw.model.category.CategoryMapper;
 import dev.vicaw.model.category.input.CategoryCreateInput;
 import dev.vicaw.model.noticia.Noticia;
-import dev.vicaw.model.user.Role;
-import dev.vicaw.model.user.User;
-import dev.vicaw.model.user.UserMapper;
-import dev.vicaw.model.user.input.UserCreateInput;
-import dev.vicaw.model.user.input.UserLoginInput;
-import dev.vicaw.model.user.output.UserLoginOutput;
+import dev.vicaw.model.noticia.output.FeedOutput;
+import dev.vicaw.model.noticia.output.NoticiaOutput;
+
 import dev.vicaw.repository.CategoryRepository;
-import dev.vicaw.repository.UserRepository;
+import dev.vicaw.repository.NoticiaRepository;
 
 @RequestScoped
 public class CategoryServiceImpl implements CategoryService {
@@ -41,21 +40,16 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Category> list() {
         return categoryRepository.listAll();
-        // return categoryMapper.toModelList(categoryRepository.listAll());
     }
 
     @Override
-    public List<Noticia> listCategoryArticlesById(Long categoryId) {
-        return categoryRepository.findById(categoryId).getNoticias();
-    }
+    public Category getBySlug(String slug) {
+        Optional<Category> category = categoryRepository.findBySlug(slug);
 
-    @Override
-    public List<Noticia> listCategoryArticlesBySlug(String categorySlug) {
-        Optional<Category> category = categoryRepository.findBySlug(categorySlug);
-        if (!category.isPresent())
+        if (category.isEmpty())
             throw new ApiException(404, "Essa categoria não existe.");
 
-        return category.get().getNoticias();
+        return category.get();
     }
 
     @Transactional

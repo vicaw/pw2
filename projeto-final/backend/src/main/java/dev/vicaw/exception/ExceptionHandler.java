@@ -4,10 +4,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@Provider
+//@Provider
 public class ExceptionHandler implements ExceptionMapper<Exception> {
 
     @Override

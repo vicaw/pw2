@@ -2,17 +2,19 @@ import { NoticiaCardType, NoticiaType } from "../../../types/noticia";
 
 import parse from "html-react-parser";
 import moment from "moment";
-import NoticiaCard from "../../../components/server/ArticleFeed/articlecard";
+import NoticiaCard from "../../../components/client/articlesfeed/articlecard";
 import { CategoryType } from "../../../types/category";
 import { notFound } from "next/navigation";
+import AllArticlesWrapper from "../../../components/client/articlesfeed/allarticleswrapper";
 
-const fetchFeed = async (slug: string) => {
-  const feedinfo: NoticiaCardType[] = await fetch(
-    `http://localhost:8080/api/categories/slugs/${slug}/articles`,
-    { cache: "no-cache" }
-  ).then((res) => res.json());
+type Response = {
+  hasMore: boolean;
+  articles: NoticiaCardType[];
+};
 
-  return feedinfo;
+const fetchCategories = async (slug: string) => {
+  const res = await fetch(`http://localhost:8080/api/categories/slugs/${slug}`);
+  if (!res.ok) throw "NotFound";
 };
 
 type PageProps = {
@@ -22,29 +24,13 @@ type PageProps = {
 };
 
 async function Category({ params: { categorySlug } }: PageProps) {
+  console.log(categorySlug);
   try {
-    const noticias = await fetchFeed(categorySlug);
+    await fetchCategories(categorySlug);
     return (
-      <>
-        <main className="container mx-auto px-10 mb-8 pt-28">
-          <div className="grid grid-cols-4">
-            <div className="flex flex-col divide-y col-span-3 gap-8">
-              {noticias
-                ? noticias.map((noticia) => (
-                    <NoticiaCard key={noticia.titulo_feed} {...noticia} />
-                  ))
-                : null}
-              <span className="bg-red-700 pt-5 pb-5 text-white font-bold tracking-tight rounded text-center shadow-md cursor-pointer">
-                VEJA MAIS
-              </span>
-            </div>
-
-            <div className="">
-              <p></p>
-            </div>
-          </div>
-        </main>
-      </>
+      <main className="container mx-auto px-10 mb-8 pt-28">
+        <AllArticlesWrapper category={categorySlug} />
+      </main>
     );
   } catch (error) {
     return notFound();

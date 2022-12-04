@@ -1,3 +1,4 @@
+import { UserType } from ".";
 import { CategoryType } from "./category";
 
 export type NoticiaType = {
@@ -10,6 +11,7 @@ export type NoticiaType = {
     createdAt: string;
     updatedAt: string;
     category: CategoryType;
+    author: UserType;
   };
 
   export type NoticiaCardType = {

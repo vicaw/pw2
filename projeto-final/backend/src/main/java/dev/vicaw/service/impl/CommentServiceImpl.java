@@ -39,17 +39,25 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ArticleCommentsOutput getArticleComments(Long id, int page) {
-
+    public ArticleCommentsOutput getArticleComments(Long id, int pagesize, int pagenumber) {
         PanacheQuery<Comment> commentsWithoutParent = commentRepository
                 .find("noticia_id = ?1 AND parent_id IS NULL order by createdAt DESC", id);
 
-        List<Comment> comments = commentsWithoutParent.page(Page.of(page, 10)).list();
+        PanacheQuery<Comment> page = commentsWithoutParent.page(Page.of(pagenumber, pagesize));
 
-        long count = commentsWithoutParent.count();
+        List<Comment> comments = page.list();
+
+        boolean hasMore = page.hasNextPage();
+
         List<CommentOutput> commentsMapped = commentMapper.toCommentOutputList(comments);
 
-        return new ArticleCommentsOutput(count, commentsMapped);
+        return new ArticleCommentsOutput(hasMore, commentsMapped);
+    }
+
+    @Override
+    public long getArticleCommentsCount(Long id) {
+        long count = commentRepository.find("noticia_id", id).count();
+        return count;
     }
 
     @Override

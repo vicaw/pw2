@@ -14,6 +14,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   user: UserType | null;
   signIn: (data: SignInData) => Promise<void>;
+  setSession: (token: string, user: UserType) => void;
   signOut: () => void;
 };
 
@@ -60,9 +61,12 @@ export function AuthProvider({ children }: any) {
         throw err.response.data.message;
       });
 
-    const token = data.token;
-    const user = data.user;
+    setSession(data.token, data.user);
 
+    //Router.push("/");
+  }
+
+  function setSession(token: string, user: UserType) {
     setCookie(undefined, "nextauth.token", token, {
       maxAge: 60 * 60 * 1, // 1 hour
     });
@@ -70,8 +74,6 @@ export function AuthProvider({ children }: any) {
     api.defaults.headers["Authorization"] = `Bearer ${token}`;
 
     setUser(user);
-
-    //Router.push("/");
   }
 
   function signOut() {
@@ -80,7 +82,9 @@ export function AuthProvider({ children }: any) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, signIn, signOut, setSession }}
+    >
       {children}
     </AuthContext.Provider>
   );

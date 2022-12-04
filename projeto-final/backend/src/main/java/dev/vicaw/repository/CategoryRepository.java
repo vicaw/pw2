@@ -1,9 +1,7 @@
 package dev.vicaw.repository;
 
 import java.util.Optional;
-
 import javax.enterprise.context.ApplicationScoped;
-
 import dev.vicaw.model.category.Category;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 

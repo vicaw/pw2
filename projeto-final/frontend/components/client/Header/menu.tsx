@@ -1,15 +1,8 @@
 "use client";
+
 import Link from "next/link";
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  use,
-  useContext,
-} from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/20/solid";
-import { InferGetStaticPropsType } from "next";
 import { CategoryType } from "../../../types/category";
 import { AuthContext } from "../../../contexts/AuthContext";
 import {
@@ -19,13 +12,27 @@ import {
 
 //???????????????????????
 
-interface Props {
-  categories: CategoryType[];
-}
+const fetchCategories = async () => {
+  const categories: CategoryType[] = await fetch(
+    "http://localhost:8080/api/categories"
+  )
+    .then((res) => res.json())
+    .catch(() => {
+      [{}];
+    });
+  console.log("fetch menu categories");
 
-function Menu({ categories }: Props) {
+  return categories;
+};
+
+function Menu() {
   const [layer, setLayer] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [categories, setCategories] = useState<CategoryType[]>([]);
+
+  useEffect(() => {
+    fetchCategories().then((c) => setCategories(c));
+  }, []);
 
   const { signOut, isAuthenticated, user } = useContext(AuthContext);
   const { showModal } = useGlobalModalContext();
@@ -185,7 +192,7 @@ function Menu({ categories }: Props) {
           <div
             className={
               (layer == 1 ? "current " : "") +
-              "transition-all select-none h-screen bg-[#fafafa] divide-y absolute w-[272px]  text-white left-[100%] [&.current]:left-0"
+              "transition-all select-none h-screen bg-[#fafafa] divide-y absolute w-[272px]  text-white left-[100%] [&.current]:left-0 text-base"
             }
           >
             <div

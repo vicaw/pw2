@@ -44,9 +44,11 @@ public class Category {
     private String slug;
 
     @CreationTimestamp
+    @JsonIgnore
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @JsonIgnore
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)

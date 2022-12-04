@@ -15,6 +15,7 @@ export default function RegistrationForm() {
   const [registred, SetRegistred] = useState(false);
 
   const { hideModal } = useGlobalModalContext();
+  const { setSession } = useContext(AuthContext);
 
   const { register, handleSubmit } = useForm();
 
@@ -22,12 +23,14 @@ export default function RegistrationForm() {
     setError("");
     setIsLoading(true);
     try {
-      await registrationRequest(data as RegistrationRequestData);
+      const res = await registrationRequest(data as RegistrationRequestData);
+      setSession(res.token, res.user);
       SetRegistred(true);
     } catch (err) {
       setError(err as string);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }
 
   return (

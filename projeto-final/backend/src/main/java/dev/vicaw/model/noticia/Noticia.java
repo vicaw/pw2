@@ -6,13 +6,14 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
+
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -23,19 +24,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.vicaw.model.category.Category;
 import dev.vicaw.model.comment.Comment;
 import dev.vicaw.model.user.User;
-import dev.vicaw.model.category.Category;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import lombok.NoArgsConstructor;
+
 @Entity
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Table(name = "Noticias")
 public class Noticia {
 
@@ -61,20 +59,26 @@ public class Noticia {
 
     private String resumo_feed;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", insertable = false, updatable = false)
+    @ManyToOne(targetEntity = Category.class, fetch = FetchType.LAZY)
     private Category category;
+
+    @Column(name = "category_id")
+    private Long categoryId;
+
+    @JoinColumn(name = "author_id", insertable = false, updatable = false)
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
+    private User author;
+
+    @Column(name = "author_id")
+    private Long authorId;
 
     @JsonIgnore
     @OneToMany(mappedBy = "noticia", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id")
-    private User author;
-
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    public LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;

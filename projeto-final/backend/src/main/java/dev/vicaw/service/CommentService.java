@@ -10,13 +10,15 @@ public interface CommentService {
 
     public List<CommentOutput> list();
 
-    public ArticleCommentsOutput getArticleComments(Long id, int page);
-
     public CommentOutput getById(Long id);
 
     public CommentOutput create(PostCommentInput commentInput);
 
     public void delete(Long id);
+
+    public ArticleCommentsOutput getArticleComments(Long id, int pagesize, int pagenumber);
+
+    public long getArticleCommentsCount(Long id);
 
     // public List<Comment> getChildren(Long id);
 

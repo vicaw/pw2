@@ -45,7 +45,7 @@ async function Noticia({
             {noticia.subtitulo}
           </h2>
           <div className="mt-10 mb-10 text-gray-600">
-            <p className="text-gray-700 font-bold">Por Autor</p>
+            <p className="text-gray-700 font-bold">Por {noticia.author.name}</p>
             <p>
               {moment(noticia.createdAt).format("DD/MM/YYYY HH[h]mm ")}
               <span className="before:content-['\B7']">
@@ -63,7 +63,7 @@ async function Noticia({
             src="https://random.imagecdn.app/672/378"
             alt=""
           />
-          <div className="mt-10">{parse(noticia.body)}</div>
+          <div className="my-10">{parse(noticia.body)}</div>
         </article>
         <hr />
         <CommentArea articleId={noticia.id} />

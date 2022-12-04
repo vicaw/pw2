@@ -4,11 +4,13 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -43,7 +45,7 @@ public class NoticiaResource {
     @Path("/slugs/{noticiaSlug}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getById(@PathParam("noticiaSlug") String noticiaSlug) {
+    public Response getBySlug(@PathParam("noticiaSlug") String noticiaSlug) {
         return Response.status(Status.OK).entity(noticiaService.getBySlug(noticiaSlug)).build();
     }
 
@@ -58,7 +60,17 @@ public class NoticiaResource {
     @GET
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllFeedInfo() {
-        return Response.status(Status.OK).entity(noticiaService.getAllFeedInfo()).build();
+    public Response getFeedInfo(@DefaultValue("10") @QueryParam("pagesize") int pagesize,
+            @QueryParam("page") int page, @QueryParam("category") String categorySlug) {
+        return Response.status(Status.OK).entity(noticiaService.getFeedInfo(pagesize, page, categorySlug)).build();
+    }
+
+    @Path("/search")
+    @GET
+    @PermitAll
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchArticle(@QueryParam("q") String query) {
+        System.out.println(query);
+        return Response.status(Status.OK).entity(noticiaService.searchArticle(query)).build();
     }
 }

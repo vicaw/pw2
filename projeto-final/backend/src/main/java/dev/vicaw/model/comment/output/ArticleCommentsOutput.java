@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArticleCommentsOutput {
-    long count;
+    boolean hasMore;
     List<CommentOutput> comments;
 }

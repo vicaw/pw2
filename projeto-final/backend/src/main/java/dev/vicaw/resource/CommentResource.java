@@ -5,6 +5,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -49,8 +50,19 @@ public class CommentResource {
     @Path("/article/{articleId}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getArticleComments(@PathParam("articleId") Long articleId, @QueryParam("page") int page) {
-        return Response.status(Status.OK).entity(commentService.getArticleComments(articleId, page)).build();
+    public Response getArticleComments(
+            @PathParam("articleId") Long articleId,
+            @DefaultValue("10") @QueryParam("pagesize") int pagesize,
+            @QueryParam("page") int page) {
+        return Response.status(Status.OK).entity(commentService.getArticleComments(articleId, pagesize, page)).build();
+    }
+
+    @Path("/article/{articleId}/count")
+    @GET
+    @PermitAll
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getArticleCommentsCount(@PathParam("articleId") Long articleId) {
+        return Response.status(Status.OK).entity(commentService.getArticleCommentsCount(articleId)).build();
     }
 
     @Path("/{commentId}")

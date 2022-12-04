@@ -24,6 +24,8 @@ public interface UserMapper {
 
     UserLoginInput toLoginInput(User user);
 
+    UserLoginInput toLoginInput(UserCreateInput createInput);
+
     // @InheritInverseConfiguration(name = "toModel")
     // UserEntity toEntity(User domain);
 

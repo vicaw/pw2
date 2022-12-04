@@ -40,7 +40,8 @@ export default function Comment({ comment, height, removeComment }: PageProps) {
   const { user } = useContext(AuthContext);
 
   const addChildren = (comment: CommentType) => {
-    setChildren([comment, ...(children as [])]);
+    if (user) comment.author = user;
+    setChildren([...(children as []), comment]);
   };
 
   const removeChildren = (id: string) => {

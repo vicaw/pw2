@@ -54,18 +54,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.persist(user);
 
-        String token = Jwt
-                .issuer("http://localhost:8080")
-                .upn(user.getEmail())
-                .groups(user.getRole().toString())
-                .claim(Claims.full_name, user.getName())
-                .claim(Claims.sub, user.getId().toString())
-                .sign();
-
-        UserLoginOutput loginOutput = new UserLoginOutput(token, userMapper.toModel(user));
-
-        return loginOutput;
-
+        return login(userMapper.toLoginInput(userInput));
     }
 
     @Override

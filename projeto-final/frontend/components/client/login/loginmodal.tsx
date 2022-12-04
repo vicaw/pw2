@@ -9,13 +9,10 @@ import LoginForm from "./loginform";
 import RegistrationForm from "./registrationform";
 
 export default function LoginModal() {
-  const [error, setError] = useState("");
   const [registerMode, setRegisterMode] = useState(false);
 
-  const { signIn, signOut, isAuthenticated, user } = useContext(AuthContext);
+  const { isAuthenticated } = useContext(AuthContext);
   const { hideModal } = useGlobalModalContext();
-
-  const { register, handleSubmit } = useForm();
 
   const handleModalToggle = () => {
     hideModal();
@@ -70,15 +67,17 @@ export default function LoginModal() {
                 ) : (
                   <>
                     <RegistrationForm />
-                    <div className="text-sm mt-4 text-gray-700">
-                      <span>Já tem uma conta?</span>
-                      <button
-                        className="ml-1 font-bold text-red-600"
-                        onClick={() => setRegisterMode(false)}
-                      >
-                        ENTRE.
-                      </button>
-                    </div>
+                    {!isAuthenticated ? (
+                      <div className="text-sm mt-4 text-gray-700">
+                        <span>Já tem uma conta?</span>
+                        <button
+                          className="ml-1 font-bold text-red-600"
+                          onClick={() => setRegisterMode(false)}
+                        >
+                          ENTRE.
+                        </button>
+                      </div>
+                    ) : null}
                   </>
                 )}
               </Dialog.Panel>

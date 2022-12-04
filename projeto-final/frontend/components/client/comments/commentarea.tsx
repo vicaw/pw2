@@ -1,19 +1,14 @@
 "use client";
 
-import React, { use, useContext, useEffect, useRef, useState } from "react";
-import moment, { LongDateFormatKey } from "moment";
-import {
-  ArrowUturnLeftIcon,
-  ChevronDownIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/20/solid";
+import React, { useContext, useEffect, useRef, useState } from "react";
+
 import { AuthContext } from "../../../contexts/AuthContext";
-import { CommentType, PostCommentType } from "../../../types";
-import axios from "axios";
+import { CommentType } from "../../../types";
+
 import { api } from "../../../services/api";
 import Comment from "./comment";
 import CommentForm from "./commentform";
-import Link from "next/link";
+
 import {
   MODAL_TYPES,
   useGlobalModalContext,
@@ -21,11 +16,21 @@ import {
 
 const fetchComments = async (articleId: string, page: number) => {
   const rawResponse = await api.get(
-    `http://localhost:8080/api/comments/article/${articleId}?page=${page}`
+    `http://localhost:8080/api/comments/article/${articleId}?page=${page}&pagesize=10`
   );
   const content = await rawResponse;
 
   console.log("Fetch Comments");
+  return content;
+};
+
+const fetchCommentsCount = async (articleId: string) => {
+  const rawResponse = await api.get(
+    `http://localhost:8080/api/comments/article/${articleId}/count`
+  );
+
+  const content = await rawResponse;
+  console.log("Fetch count: ", rawResponse.data);
   return content;
 };
 
@@ -36,10 +41,12 @@ interface PageProps {
 export default function CommentArea({ articleId }: PageProps) {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [showComments, setShowComments] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const maxPages = useRef(0);
+  const [count, setCount] = useState(0);
 
-  const { isAuthenticated, signOut } = useContext(AuthContext);
+  const nextPage = useRef(0);
+  const hasMore = useRef(false);
+
+  const { user, isAuthenticated, signOut } = useContext(AuthContext);
 
   const { showModal } = useGlobalModalContext();
 
@@ -47,8 +54,14 @@ export default function CommentArea({ articleId }: PageProps) {
     showModal(MODAL_TYPES.LOGIN_MODAL);
   };
 
+  const showCommentsHandler = () => {
+    setShowComments(true);
+    getMoreComments();
+  };
+
   const addComment = (comment: CommentType) => {
-    setComments([comment, ...comments]);
+    if (user) comment.author = user;
+    setComments((comments) => [comment, ...comments]);
   };
 
   const removeComment = (id: string) => {
@@ -60,15 +73,11 @@ export default function CommentArea({ articleId }: PageProps) {
   };
 
   const getMoreComments = async () => {
-    const currPage = Math.ceil(comments.length / 10);
-    console.log(currPage);
-
-    fetchComments(articleId, currPage)
+    fetchComments(articleId, nextPage.current)
       .then((res) => {
-        setComments([...comments, ...res.data.comments]);
-        maxPages.current = Math.ceil(res.data.count / 10);
-        console.log(maxPages.current);
-        if (currPage + 1 === maxPages.current) setHasMore(false);
+        setComments((prev) => [...prev, ...res.data.comments]);
+        hasMore.current = res.data.hasMore;
+        nextPage.current = nextPage.current + 1;
       })
       .catch((err) => {
         if (err.response.status === 401) {
@@ -78,8 +87,8 @@ export default function CommentArea({ articleId }: PageProps) {
   };
 
   useEffect(() => {
-    if (showComments) getMoreComments();
-  }, [showComments]);
+    fetchCommentsCount(articleId).then((res) => setCount(res.data));
+  }, []);
 
   return (
     <section className="container max-w-2xl m-auto pt-10 mt-10 border-none text-gray-700 text-sm pb-[200px]">
@@ -91,7 +100,7 @@ export default function CommentArea({ articleId }: PageProps) {
               : "text-2xl font-bold tracking-tight text-black mb-4 block"
           }
         >
-          Comentários (1)
+          Comentários ({count})
         </span>
 
         {showComments && isAuthenticated ? (
@@ -118,7 +127,7 @@ export default function CommentArea({ articleId }: PageProps) {
               />
             ))}
           </div>
-          {hasMore ? (
+          {hasMore.current ? (
             <button
               className="m-auto mt-5 block border rounded-sm p-4 border-gray-300 text-base font-semibold hover:bg-gray-200"
               onClick={getMoreComments}
@@ -132,7 +141,7 @@ export default function CommentArea({ articleId }: PageProps) {
           {isAuthenticated ? (
             <button
               className="border rounded-sm p-4 border-gray-300 text-base font-semibold hover:bg-gray-200"
-              onClick={() => setShowComments(true)}
+              onClick={showCommentsHandler}
             >
               Ver Comentários
             </button>
