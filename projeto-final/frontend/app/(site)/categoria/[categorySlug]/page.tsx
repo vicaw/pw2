@@ -1,11 +1,11 @@
-import { NoticiaCardType, NoticiaType } from "../../../types/noticia";
+import { NoticiaCardType, NoticiaType } from "../../../../types/noticia";
 
 import parse from "html-react-parser";
 import moment from "moment";
-import NoticiaCard from "../../../components/client/articlesfeed/articlecard";
-import { CategoryType } from "../../../types/category";
+import NoticiaCard from "../../../../components/client/articlesfeed/articlecard";
+import { CategoryType } from "../../../../types/category";
 import { notFound } from "next/navigation";
-import AllArticlesWrapper from "../../../components/client/articlesfeed/allarticleswrapper";
+import AllArticlesWrapper from "../../../../components/client/articlesfeed/allarticleswrapper";
 
 type Response = {
   hasMore: boolean;
@@ -33,6 +33,7 @@ async function Category({ params: { categorySlug } }: PageProps) {
       </main>
     );
   } catch (error) {
+    console.log("n achei");
     return notFound();
   }
 }

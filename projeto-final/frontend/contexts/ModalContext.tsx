@@ -1,18 +1,19 @@
 import React, { useState, createContext, useContext } from "react";
-import LoginModal from "../components/client/login/loginmodal";
+import LoginModal from "../components/client/loginmodal/loginmodal";
+import CreateArticleModal from "../components/client/createarticlemodal/createarticlemodal";
 
 //import { CreateModal, DeleteModal,UpdateModal } from './components';
 
 export const MODAL_TYPES = {
   LOGIN_MODAL: "LOGIN_MODAL",
-  //CREATE_MODAL:”CREATE_MODAL”,
+  CREATEARTICLE_MODAL: "CREATEARTICLE_MODAL",
   //DELETE_MODAL: “DELETE_MODAL”,
   //UPDATE_MODAL: “UPDATE_MODAL”
 };
 
 const MODAL_COMPONENTS: any = {
   [MODAL_TYPES.LOGIN_MODAL]: LoginModal,
-  //[MODAL_TYPES.CREATE_MODAL]: CreateModal,
+  [MODAL_TYPES.CREATEARTICLE_MODAL]: CreateArticleModal,
   //[MODAL_TYPES.DELETE_MODAL]: DeleteModal,
   //[MODAL_TYPES.UPDATE_MODAL]: UpdateModal
 };

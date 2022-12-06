@@ -11,4 +11,6 @@ public interface CategoryService {
     public Category create(CategoryCreateInput input);
 
     public Category getBySlug(String slug);
+
+    public Category getById(Long id);
 }

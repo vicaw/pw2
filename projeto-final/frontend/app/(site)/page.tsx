@@ -1,5 +1,5 @@
 import React from "react";
-import AllArticlesWrapper from "../components/client/articlesfeed/allarticleswrapper";
+import AllArticlesWrapper from "../../components/client/articlesfeed/allarticleswrapper";
 
 function Home() {
   return (

@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
-import SearchArticlesWrapper from "../../components/client/search/searcharticleswrapper";
+import SearchArticlesWrapper from "../../../components/client/search/searcharticleswrapper";
 
 function Busca() {
   return (

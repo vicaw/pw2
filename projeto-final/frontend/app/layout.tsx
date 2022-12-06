@@ -1,10 +1,7 @@
 import "../styles/globals.css";
-import { CategoryType } from "../types/category";
-import Header from "../components/client/header/header";
 import Providers from "./providers";
-import { Suspense } from "react";
 
-export default function RootLayout({
+export default function SiteLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -13,16 +10,7 @@ export default function RootLayout({
     <html>
       <head />
       <body>
-        <Providers>
-          <Header />
-          <Suspense
-            fallback={
-              <div className="absolute right-1/2 bottom-1/2">loading...</div>
-            }
-          >
-            {children}
-          </Suspense>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -31,8 +31,15 @@ public class CategoryResource {
         return Response.status(Status.OK).entity(categoryService.list()).build();
     }
 
-    @Path("/slugs/{categorySlug}")
     @GET
+    @Path("/{categoryId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getById(@PathParam("categoryId") Long categoryId) {
+        return Response.status(Status.OK).entity(categoryService.getById(categoryId)).build();
+    }
+
+    @GET
+    @Path("/slugs/{categorySlug}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getBySlug(@PathParam("categorySlug") String categorySlug) {
         return Response.status(Status.OK).entity(categoryService.getBySlug(categorySlug)).build();

@@ -7,6 +7,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -19,6 +20,7 @@ import javax.ws.rs.core.Response.Status;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import dev.vicaw.model.noticia.Noticia;
+import dev.vicaw.model.noticia.input.CreateArticleInput;
 import dev.vicaw.service.NoticiaService;
 
 @Path("/api/noticias")
@@ -28,10 +30,9 @@ public class NoticiaResource {
     NoticiaService noticiaService;
 
     @GET
-    // @RolesAllowed({ "USER" })
     @Produces(MediaType.APPLICATION_JSON)
-    public Response list() {
-        return Response.status(Status.OK).entity(noticiaService.list()).build();
+    public Response list(@QueryParam("authorId") int authorId) {
+        return Response.status(Status.OK).entity(noticiaService.list(authorId)).build();
     }
 
     @Path("/{noticiaId}")
@@ -50,10 +51,19 @@ public class NoticiaResource {
     }
 
     @POST
+    @RolesAllowed({ "EDITOR", "ADMIN" })
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response save(Noticia noticia) {
-        return Response.status(Status.OK).entity(noticiaService.create(noticia)).build();
+    public Response save(CreateArticleInput articleInput) {
+        return Response.status(Status.OK).entity(noticiaService.create(articleInput)).build();
+    }
+
+    @PUT
+    @RolesAllowed({ "EDITOR", "ADMIN" })
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response edit(CreateArticleInput articleInput) {
+        return Response.status(Status.OK).entity(noticiaService.edit(articleInput)).build();
     }
 
     @Path("/feedinfo")

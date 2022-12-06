@@ -9,6 +9,7 @@ import {
   MODAL_TYPES,
   useGlobalModalContext,
 } from "../../../contexts/ModalContext";
+import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 
 //???????????????????????
 
@@ -38,6 +39,7 @@ function Menu() {
   const { showModal } = useGlobalModalContext();
 
   const loginModal = () => {
+    setIsOpen(false);
     showModal(MODAL_TYPES.LOGIN_MODAL);
   };
 
@@ -137,6 +139,15 @@ function Menu() {
                       {user?.name}
                     </span>
                   </div>
+                  <Link
+                    href={"/painel"}
+                    className="flex mt-5 gap-3 hover:text-red-600  text-gray-700"
+                  >
+                    <AdjustmentsHorizontalIcon className="h-[18px] text-[#999]" />
+                    <span className="leading-none tracking-tighter text-base font-thin lowercase">
+                      painel do {user?.role}
+                    </span>
+                  </Link>
                   <button
                     onClick={signOut}
                     className="flex mt-5 gap-3 hover:text-red-600 hover:fill-red-600 text-gray-700"

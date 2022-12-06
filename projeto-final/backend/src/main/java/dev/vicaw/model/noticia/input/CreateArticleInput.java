@@ -1,8 +1,4 @@
-package dev.vicaw.model.noticia.output;
-
-import java.time.LocalDateTime;
-
-import dev.vicaw.model.category.Category;
+package dev.vicaw.model.noticia.input;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,12 +10,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NoticiaFeedOutput {
+public class CreateArticleInput {
     private Long id;
-    private String slug;
+    private String titulo;
+    private String subtitulo;
+    private String body;
     private String chapeu_feed;
     private String titulo_feed;
     private String resumo_feed;
-    private LocalDateTime createdAt;
-    private Category category;
+    private Long categoryId;
+    private Long authorId;
 }

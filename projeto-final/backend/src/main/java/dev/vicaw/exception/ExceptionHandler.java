@@ -6,7 +6,7 @@ import javax.ws.rs.ext.Provider;
 
 import lombok.Data;
 
-//@Provider
+@Provider
 public class ExceptionHandler implements ExceptionMapper<Exception> {
 
     @Override
