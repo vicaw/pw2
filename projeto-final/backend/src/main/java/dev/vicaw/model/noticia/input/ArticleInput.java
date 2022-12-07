@@ -10,8 +10,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateArticleInput {
+public class ArticleInput {
     private Long id;
+    private String slug;
     private String titulo;
     private String subtitulo;
     private String body;

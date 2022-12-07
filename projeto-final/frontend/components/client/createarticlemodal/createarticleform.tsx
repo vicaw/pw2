@@ -20,10 +20,12 @@ import { CategoryType } from "../../../types/category";
 import { api } from "../../../services/api";
 import { AxiosError } from "axios";
 import { NoticiaType } from "../../../types/noticia";
+import { PhotoIcon } from "@heroicons/react/24/outline";
 
 const fetchCategories = async () => {
   const categories: CategoryType[] = await fetch(
-    "http://localhost:8080/api/categories"
+    "http://localhost:8080/api/categories",
+    { cache: "force-cache", next: { revalidate: 60 } }
   )
     .then((res) => res.json())
     .catch(() => {
@@ -36,6 +38,7 @@ const fetchCategories = async () => {
 
 export type CreateArticleRequestData = {
   id: string | null;
+  slug: string | null;
   titulo: string;
   subtitulo: string;
   body: string;
@@ -46,12 +49,15 @@ export type CreateArticleRequestData = {
   authorId: string;
 };
 
-async function createArticleRequest(
-  data: CreateArticleRequestData
-): Promise<any> {
+async function createArticleRequest(data: FormData): Promise<any> {
   try {
-    const res = await api.post(`http://localhost:8080/api/noticias`, data);
+    const res = await api.post(`http://localhost:8080/api/noticias`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     const dados = await res.data;
+    console.log(dados);
     return dados;
   } catch (err) {
     const errors = err as AxiosError<any>;
@@ -59,12 +65,14 @@ async function createArticleRequest(
   }
 }
 
-async function editArticleRequest(
-  data: CreateArticleRequestData
-): Promise<any> {
+async function editArticleRequest(data: FormData): Promise<any> {
   console.log(data);
   try {
-    const res = await api.put(`http://localhost:8080/api/noticias`, data);
+    const res = await api.put(`http://localhost:8080/api/noticias`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     const dados = await res.data;
 
     return dados;
@@ -88,7 +96,9 @@ export default function CreateArticleForm({ article }: Props) {
   const { register, handleSubmit } = useForm();
 
   const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    article ? `http://localhost:8081/images/articles/${article.id}` : null
+  );
 
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [currentCategory, setCurrentCategory] = useState<
@@ -145,44 +155,35 @@ export default function CreateArticleForm({ article }: Props) {
     setPreviewUrl(null);
   };
 
-  const onUploadFile = async (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-
-    if (!file) {
-      return;
-    }
-
-    var formData = new FormData();
-    formData.append("file", file);
-    formData.append("fileName", file.name);
-    console.log(file.name);
-
-    const data = await fetch("http://localhost:8081/images", {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => console.log(err));
-  };
-
   async function handleRegistration(data: FieldValues) {
+    console.log("Slug: ");
+
     if (!user) return;
+
+    if (!file && !article) return;
 
     let reqData = data as CreateArticleRequestData;
     reqData.authorId = user.id;
     reqData.id = article ? article.id : null;
-    setError("");
-    setIsLoading(true);
+    reqData.slug = article ? article.slug : null;
+
+    var formData = new FormData();
+    if (file) {
+      formData.append("file", file);
+      formData.append("fileName", file.name);
+    }
+    formData.append("article", JSON.stringify(reqData));
+
     try {
+      setIsLoading(true);
       const res = !article
-        ? await createArticleRequest(reqData)
-        : await editArticleRequest(reqData);
+        ? await createArticleRequest(formData)
+        : await editArticleRequest(formData);
       SetRegistred(true);
     } catch (err) {
       setError(err as string);
     } finally {
+      setError("");
       setIsLoading(false);
     }
   }
@@ -207,33 +208,20 @@ export default function CreateArticleForm({ article }: Props) {
                   <div className="flex-grow">
                     {previewUrl ? (
                       <div className="mx-auto w-80">
-                        <Image
+                        <img
                           alt="file uploader preview"
-                          objectFit="cover"
+                          //objectFit="cover"
                           src={previewUrl}
                           width={320}
                           height={218}
-                          layout="fixed"
+                          // layout="fixed"
                         />
                       </div>
                     ) : (
-                      <label className="flex flex-col items-center justify-center h-full py-3 transition-colors duration-150 cursor-pointer hover:text-gray-600">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-14 h-14"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
-                          />
-                        </svg>
-                        <strong className="text-sm font-medium">
-                          Select an image
+                      <label className="flex flex-col items-center justify-center h-full py-3 transition-colors duration-150 cursor-pointer hover:text-red-600">
+                        <PhotoIcon className="w-14 h-14" />
+                        <strong className="text-sm font-semibold">
+                          Selecione uma imagem
                         </strong>
                         <input
                           className="block w-0 h-0"
@@ -248,16 +236,9 @@ export default function CreateArticleForm({ article }: Props) {
                     <button
                       disabled={!previewUrl}
                       onClick={onCancelFile}
-                      className="w-1/2 px-4 py-3 text-sm font-medium text-white transition-colors duration-300 bg-gray-700 rounded-sm md:w-auto md:text-base disabled:bg-gray-400 hover:bg-gray-600"
+                      className="w-1/2 px-4 py-3 text-sm font-bold tracking-tighter text-white transition-colors duration-300 bg-red-600 rounded-sm md:w-auto disabled:bg-gray-400 hover:bg-red-700 disabled:cursor-not-allowed"
                     >
-                      Cancel file
-                    </button>
-                    <button
-                      disabled={!previewUrl}
-                      onClick={onUploadFile}
-                      className="w-1/2 px-4 py-3 text-sm font-medium text-white transition-colors duration-300 bg-gray-700 rounded-sm md:w-auto md:text-base disabled:bg-gray-400 hover:bg-gray-600"
-                    >
-                      Upload file
+                      CANCELAR
                     </button>
                   </div>
                 </div>

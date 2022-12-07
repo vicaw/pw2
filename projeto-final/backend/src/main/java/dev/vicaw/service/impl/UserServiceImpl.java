@@ -75,6 +75,7 @@ public class UserServiceImpl implements UserService {
                 .groups(user.getRole().toString())
                 .claim(Claims.full_name, user.getName())
                 .claim(Claims.sub, user.getId().toString())
+                .expiresIn(60 * 60 * 7)
                 .sign();
 
         UserLoginOutput userOutput = new UserLoginOutput(token, user);

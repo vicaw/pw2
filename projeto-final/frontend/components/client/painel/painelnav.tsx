@@ -1,4 +1,4 @@
-import { DocumentTextIcon } from "@heroicons/react/24/outline";
+import { DocumentTextIcon, NewspaperIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 type menuItemType = {
@@ -93,7 +93,7 @@ export default function PainelAside() {
             className="inline-flex items-center justify-center py-3 text-red-600 bg-white rounded-lg"
           >
             <span className="sr-only">Dashboard</span>
-            <DocumentTextIcon className="h-6 " />
+            <NewspaperIcon className="h-6 " />
           </a>
 
           {menuItems.map((item) => MenuItem(item))}

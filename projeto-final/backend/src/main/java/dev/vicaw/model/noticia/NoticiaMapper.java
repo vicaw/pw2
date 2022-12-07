@@ -1,7 +1,7 @@
 package dev.vicaw.model.noticia;
 
 import dev.vicaw.model.noticia.output.NoticiaOutput;
-import dev.vicaw.model.noticia.input.CreateArticleInput;
+import dev.vicaw.model.noticia.input.ArticleInput;
 import dev.vicaw.model.noticia.output.NoticiaFeedOutput;
 import dev.vicaw.model.user.UserMapper;
 
@@ -28,7 +28,7 @@ public interface NoticiaMapper {
                 .build();
     }
 
-    Noticia toModel(CreateArticleInput articleInput);
+    Noticia toModel(ArticleInput articleInput);
 
     // List<NoticiaFeed> toFeedOutputList(List<Noticia> entities);
 

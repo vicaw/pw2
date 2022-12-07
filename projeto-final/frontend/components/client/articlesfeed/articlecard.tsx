@@ -7,8 +7,8 @@ function NoticiaCard(noticia: NoticiaCardType) {
   return (
     <div className="grid grid-cols-12 gap-4 pt-8">
       <img
-        className="col-span-4"
-        src="https://random.imagecdn.app/672/378"
+        className="col-span-4 bg-gray-500"
+        src={`http://localhost:8081/images/articles/540/304/${noticia.id}`}
         alt=""
       />
       <div className="flex flex-col col-span-8 gap-2">

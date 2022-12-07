@@ -11,7 +11,7 @@ import CommentArea from "../../../../../../components/client/comments/commentare
 const fetchArticles = async (slug: string) => {
   const data: NoticiaType = await fetch(
     `http://localhost:8080/api/noticias/slugs/${slug}`,
-    { cache: "force-cache" }
+    { next: { revalidate: 600 } }
   )
     .then((res) => res.json())
     .catch(() => {
@@ -48,11 +48,12 @@ async function Noticia({
             <p className="text-gray-700 font-bold">Por {noticia.author.name}</p>
             <p>
               {moment(noticia.createdAt).format("DD/MM/YYYY HH[h]mm ")}
-              <span className="before:content-['\B7']">
-                {noticia.createdAt == noticia.updatedAt
-                  ? " Atualizado " + moment(noticia.updatedAt).fromNow()
-                  : null}
-              </span>
+
+              {noticia.createdAt != noticia.updatedAt ? (
+                <span className="before:content-['\B7']">
+                  {" Atualizado " + moment(noticia.updatedAt).fromNow()}
+                </span>
+              ) : null}
             </p>
           </div>
         </div>
@@ -60,7 +61,7 @@ async function Noticia({
         <article className="max-w-2xl m-auto mt-10">
           <img
             className="container col-span-4"
-            src="https://random.imagecdn.app/672/378"
+            src={`http://localhost:8081/images/articles/${noticia.id}`}
             alt=""
           />
           <div className="my-10">{parse(noticia.body)}</div>

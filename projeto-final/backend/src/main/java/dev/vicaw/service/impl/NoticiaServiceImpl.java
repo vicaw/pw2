@@ -1,25 +1,32 @@
 package dev.vicaw.service.impl;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.slugify.Slugify;
 
 import dev.vicaw.service.CategoryService;
 import dev.vicaw.service.NoticiaService;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
+import dev.vicaw.client.ImageServiceClient;
+import dev.vicaw.client.ImageInput;
 import dev.vicaw.exception.ApiException;
 import dev.vicaw.model.category.Category;
 import dev.vicaw.model.noticia.Noticia;
 import dev.vicaw.model.noticia.NoticiaMapper;
-import dev.vicaw.model.noticia.input.CreateArticleInput;
+import dev.vicaw.model.noticia.input.ArticleInput;
+import dev.vicaw.model.noticia.input.MultipartInput;
 import dev.vicaw.model.noticia.output.FeedOutput;
 import dev.vicaw.model.noticia.output.NoticiaFeedOutput;
 import dev.vicaw.model.noticia.output.NoticiaOutput;
@@ -34,6 +41,10 @@ public class NoticiaServiceImpl implements NoticiaService {
 
     @Inject
     CategoryService categoryService;
+
+    @Inject
+    @RestClient
+    ImageServiceClient imageService;
 
     @Inject
     NoticiaMapper noticiaMapper;
@@ -70,7 +81,17 @@ public class NoticiaServiceImpl implements NoticiaService {
 
     @Transactional
     @Override
-    public Noticia create(CreateArticleInput articleInput) {
+    public Noticia create(MultipartInput body) {
+        // Mapeia JSON para um objeto.
+        ObjectMapper mapper = new ObjectMapper();
+        ArticleInput articleInput = null;
+
+        try {
+            articleInput = mapper.readValue(body.article, ArticleInput.class);
+        } catch (IOException e) {
+            throw new ApiException(401, "Erro ao processar informações.");
+        }
+
         Noticia article = noticiaMapper.toModel(articleInput);
 
         if (!jwt.getSubject().equals(article.getAuthorId().toString()))
@@ -86,14 +107,28 @@ public class NoticiaServiceImpl implements NoticiaService {
         if (noticiaRepository.findBySlug(article.getSlug()).isPresent())
             throw new ApiException(409, "Já existe uma notícia com o título informado.");
 
+        // if (res.getStatus() != 200)
+        // throw new ApiException(400, "Erro ao fazer upload da imagem.");
+
         noticiaRepository.persist(article);
+
+        imageService.upload(new ImageInput(body.getFile(), body.getFileName(), article.getId().toString()));
 
         return article;
     }
 
     @Transactional
     @Override
-    public Noticia edit(CreateArticleInput articleInput) {
+    public Noticia edit(MultipartInput body) {
+        ObjectMapper mapper = new ObjectMapper();
+        ArticleInput articleInput = null;
+
+        try {
+            articleInput = mapper.readValue(body.article, ArticleInput.class);
+        } catch (IOException e) {
+            throw new ApiException(401, "Erro ao processar informações.");
+        }
+
         Noticia article = noticiaMapper.toModel(articleInput);
 
         // Também verifica se a notícia existe (Exceção se não existir)
@@ -132,6 +167,10 @@ public class NoticiaServiceImpl implements NoticiaService {
 
         article = noticiaRepository.getEntityManager().merge(article);
         noticiaRepository.persist(article);
+
+        // Atualiza a imagem da capa, caso uma nova tenha sido enviada.
+        if (body.file != null)
+            imageService.update(new ImageInput(body.getFile(), body.getFileName(), article.getId().toString()));
 
         return article;
     }

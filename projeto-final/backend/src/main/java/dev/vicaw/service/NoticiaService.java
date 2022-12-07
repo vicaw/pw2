@@ -3,7 +3,8 @@ package dev.vicaw.service;
 import java.util.List;
 
 import dev.vicaw.model.noticia.Noticia;
-import dev.vicaw.model.noticia.input.CreateArticleInput;
+import dev.vicaw.model.noticia.input.ArticleInput;
+import dev.vicaw.model.noticia.input.MultipartInput;
 import dev.vicaw.model.noticia.output.FeedOutput;
 import dev.vicaw.model.noticia.output.NoticiaFeedOutput;
 import dev.vicaw.model.noticia.output.NoticiaOutput;
@@ -14,9 +15,9 @@ public interface NoticiaService {
 
     public Noticia getById(Long id);
 
-    public Noticia create(CreateArticleInput articleInput);
+    public Noticia create(MultipartInput body);
 
-    public Noticia edit(CreateArticleInput articleInput);
+    public Noticia edit(MultipartInput body);
 
     public NoticiaOutput getBySlug(String slug);
 

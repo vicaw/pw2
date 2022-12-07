@@ -18,6 +18,7 @@ export type NoticiaType = {
   };
 
   export type NoticiaCardType = {
+    id: string;
     slug: string;
     chapeu_feed: string;
     titulo_feed: string;

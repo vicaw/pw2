@@ -1,5 +1,7 @@
 package dev.vicaw.resource;
 
+import java.io.IOException;
+
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -18,9 +20,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dev.vicaw.model.noticia.Noticia;
-import dev.vicaw.model.noticia.input.CreateArticleInput;
+import dev.vicaw.model.noticia.input.ArticleInput;
+import dev.vicaw.model.noticia.input.MultipartInput;
 import dev.vicaw.service.NoticiaService;
 
 @Path("/api/noticias")
@@ -52,18 +58,18 @@ public class NoticiaResource {
 
     @POST
     @RolesAllowed({ "EDITOR", "ADMIN" })
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response save(CreateArticleInput articleInput) {
-        return Response.status(Status.OK).entity(noticiaService.create(articleInput)).build();
+    public Response save(@MultipartForm MultipartInput body) {
+        return Response.status(Status.OK).entity(noticiaService.create(body)).build();
     }
 
     @PUT
     @RolesAllowed({ "EDITOR", "ADMIN" })
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response edit(CreateArticleInput articleInput) {
-        return Response.status(Status.OK).entity(noticiaService.edit(articleInput)).build();
+    public Response edit(@MultipartForm MultipartInput body) {
+        return Response.status(Status.OK).entity(noticiaService.edit(body)).build();
     }
 
     @Path("/feedinfo")

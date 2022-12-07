@@ -13,7 +13,10 @@ type Response = {
 };
 
 const fetchCategories = async (slug: string) => {
-  const res = await fetch(`http://localhost:8080/api/categories/slugs/${slug}`);
+  const res = await fetch(
+    `http://localhost:8080/api/categories/slugs/${slug}`,
+    { cache: "force-cache", next: { revalidate: 60 } }
+  );
   if (!res.ok) throw "NotFound";
 };
 
@@ -33,7 +36,6 @@ async function Category({ params: { categorySlug } }: PageProps) {
       </main>
     );
   } catch (error) {
-    console.log("n achei");
     return notFound();
   }
 }

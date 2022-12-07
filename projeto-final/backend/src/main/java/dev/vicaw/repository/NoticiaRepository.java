@@ -19,7 +19,7 @@ public class NoticiaRepository implements PanacheRepository<Noticia> {
     }
 
     public PanacheQuery<NoticiaFeedOutput> getAllFeedInfo() {
-        return findAll().project(NoticiaFeedOutput.class);
+        return find("from Noticia n ORDER BY n.createdAt DESC").project(NoticiaFeedOutput.class);
     }
 
     public PanacheQuery<NoticiaFeedOutput> getAllFeedInfo(Long category_id) {

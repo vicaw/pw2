@@ -15,7 +15,8 @@ import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 
 const fetchCategories = async () => {
   const categories: CategoryType[] = await fetch(
-    "http://localhost:8080/api/categories"
+    "http://localhost:8080/api/categories",
+    { cache: "force-cache", next: { revalidate: 60 } }
   )
     .then((res) => res.json())
     .catch(() => {
