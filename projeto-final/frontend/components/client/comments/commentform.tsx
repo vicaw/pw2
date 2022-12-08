@@ -1,27 +1,16 @@
-"use client";
+'use client';
 
-import React, { use, useContext, useEffect, useRef, useState } from "react";
-import { AuthContext } from "../../../contexts/AuthContext";
-import { CommentType, PostCommentType } from "../../../types";
-import { api } from "../../../services/api";
-import { AxiosResponse } from "axios";
-
-const postComment = async (comment: PostCommentType) => {
-  console.log(comment);
-  const rawResponse = await api.post(
-    "http://localhost:8080/api/comments/",
-    comment
-  );
-  const content = await rawResponse;
-
-  console.log(content);
-  return content;
-};
+import React, { use, useContext, useEffect, useRef, useState } from 'react';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { api } from '../../../services/axios/api';
+import { AxiosResponse } from 'axios';
+import Comment, { NewComment } from '../../../models/Comment';
+import useCommentService from '../../../hooks/useCommentService';
 
 interface PageProps {
   parentId?: string;
   articleId: string;
-  addComment: (comment: CommentType) => void;
+  addComment: (comment: Comment) => void;
 }
 
 export default function CommentForm({
@@ -29,18 +18,17 @@ export default function CommentForm({
   articleId,
   addComment,
 }: PageProps) {
-  const [sending, setSending] = useState(false);
   const commentRef = useRef<HTMLInputElement | null>(null);
-  const { user, signOut } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
+
+  const { loading, commentPostComment } = useCommentService();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setSending(true);
-
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const body = formData.get("comment") as string;
+    const body = formData.get('comment') as string;
 
-    const postContent: PostCommentType = {
+    const postContent: NewComment = {
       articleId: articleId,
       authorId: user?.id,
       parentId: parentId ? parentId : null,
@@ -50,15 +38,10 @@ export default function CommentForm({
     e.currentTarget.reset();
     commentRef.current = null;
 
-    await postComment(postContent)
-      .then((res) => addComment(res.data))
-      .catch((err) => {
-        if (err.response.status === 401) {
-          signOut();
-        }
-      });
-
-    setSending(false);
+    const comment = await commentPostComment(postContent);
+    if (comment) {
+      addComment(comment);
+    }
   };
 
   return (
@@ -66,12 +49,12 @@ export default function CommentForm({
       <input
         type="text"
         name="comment"
-        placeholder={!sending ? "Participe da conversa" : "Enviando..."}
+        placeholder={!loading ? 'Participe da conversa' : 'Enviando...'}
         className="grow outline-none p-4 disabled:bg-gray-100"
         ref={commentRef}
-        disabled={sending}
+        disabled={loading}
       />
-      {!sending ? (
+      {!loading ? (
         <input
           type="submit"
           className="px-4 bg-gray-100 hover:bg-gray-200 cursor-pointer"

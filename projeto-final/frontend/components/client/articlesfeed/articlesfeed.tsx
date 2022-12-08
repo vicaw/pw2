@@ -1,9 +1,9 @@
-import React, { Suspense } from "react";
-import { NoticiaCardType } from "../../../types/noticia";
-import NoticiaCard from "./articlecard";
+import React, { Suspense } from 'react';
+import { ArticleCard } from '../../../models/Article';
+import NoticiaCard from './articlecard';
 
 interface Props {
-  articles: NoticiaCardType[];
+  articles: ArticleCard[];
 }
 
 function ArticlesFeed({ articles }: Props) {

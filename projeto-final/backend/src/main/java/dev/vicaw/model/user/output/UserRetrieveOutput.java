@@ -10,8 +10,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import dev.vicaw.model.article.Article;
 import dev.vicaw.model.comment.Comment;
-import dev.vicaw.model.noticia.Noticia;
 import dev.vicaw.model.user.Role;
 import lombok.Builder;
 import lombok.Data;

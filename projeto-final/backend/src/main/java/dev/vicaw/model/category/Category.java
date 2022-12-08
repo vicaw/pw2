@@ -4,13 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,20 +16,16 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import dev.vicaw.model.noticia.Noticia;
+import dev.vicaw.model.article.Article;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "category")
+@Table(name = "categories")
 public class Category {
 
     @Id
@@ -44,15 +38,13 @@ public class Category {
     private String slug;
 
     @CreationTimestamp
-    @JsonIgnore
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @JsonIgnore
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Noticia> noticias;
+    private List<Article> noticias;
 
 }

@@ -14,7 +14,7 @@ import dev.vicaw.service.CategoryService;
 import dev.vicaw.exception.ApiException;
 import dev.vicaw.model.category.Category;
 import dev.vicaw.model.category.CategoryMapper;
-import dev.vicaw.model.category.input.CategoryCreateInput;
+import dev.vicaw.model.category.input.CategoryInput;
 
 import dev.vicaw.repository.CategoryRepository;
 
@@ -54,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional
     @Override
-    public Category create(CategoryCreateInput input) {
+    public Category create(CategoryInput input) {
         Category category = categoryMapper.toModel(input);
 
         Slugify slugify = Slugify.builder().build();
@@ -68,6 +68,32 @@ public class CategoryServiceImpl implements CategoryService {
 
         return category;
 
+    }
+
+    @Transactional
+    @Override
+    public Category update(Long id, CategoryInput input) {
+        Category category = getById(id);
+
+        categoryMapper.updateEntityFromInput(input, category);
+
+        Slugify slugify = Slugify.builder().build();
+        String slug = slugify.slugify(input.getName());
+
+        if (categoryRepository.findBySlug(slug).isPresent())
+            throw new ApiException(409, "A categoria com o nome '" + category.getName() + "' já existe.");
+
+        category.setSlug(slug);
+
+        return category;
+
+    }
+
+    @Transactional
+    @Override
+    public void delete(Long id) {
+        Category category = getById(id);
+        categoryRepository.delete(category);
     }
 
 }

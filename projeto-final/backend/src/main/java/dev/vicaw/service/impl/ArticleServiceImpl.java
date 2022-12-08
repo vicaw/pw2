@@ -1,12 +1,14 @@
 package dev.vicaw.service.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -16,28 +18,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.slugify.Slugify;
 
 import dev.vicaw.service.CategoryService;
-import dev.vicaw.service.NoticiaService;
+import dev.vicaw.service.ArticleService;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
 import dev.vicaw.client.ImageServiceClient;
 import dev.vicaw.client.ImageInput;
 import dev.vicaw.exception.ApiException;
+import dev.vicaw.model.article.Article;
+import dev.vicaw.model.article.ArticleMapper;
+import dev.vicaw.model.article.input.ArticleInput;
+import dev.vicaw.model.article.input.ArticleFormInput;
+import dev.vicaw.model.article.output.FeedOutput;
+import dev.vicaw.model.article.output.ArticleFeedOutput;
+import dev.vicaw.model.article.output.ArticleOutput;
 import dev.vicaw.model.category.Category;
-import dev.vicaw.model.noticia.Noticia;
-import dev.vicaw.model.noticia.NoticiaMapper;
-import dev.vicaw.model.noticia.input.ArticleInput;
-import dev.vicaw.model.noticia.input.MultipartInput;
-import dev.vicaw.model.noticia.output.FeedOutput;
-import dev.vicaw.model.noticia.output.NoticiaFeedOutput;
-import dev.vicaw.model.noticia.output.NoticiaOutput;
-import dev.vicaw.repository.CategoryRepository;
-import dev.vicaw.repository.NoticiaRepository;
+
+import dev.vicaw.repository.ArticleRepository;
 
 @RequestScoped
-public class NoticiaServiceImpl implements NoticiaService {
+public class ArticleServiceImpl implements ArticleService {
 
     @Inject
-    NoticiaRepository noticiaRepository;
+    ArticleRepository articleRepository;
 
     @Inject
     CategoryService categoryService;
@@ -47,23 +49,23 @@ public class NoticiaServiceImpl implements NoticiaService {
     ImageServiceClient imageService;
 
     @Inject
-    NoticiaMapper noticiaMapper;
+    ArticleMapper articleMapper;
 
     @Inject
     JsonWebToken jwt;
 
     @Override
-    public List<Noticia> list(int authorId) {
+    public List<Article> list(int authorId) {
         if (authorId != 0) {
-            return noticiaRepository.list("author_id", authorId);
+            return articleRepository.list("author_id", authorId);
         }
 
-        return noticiaRepository.listAll();
+        return articleRepository.listAll();
     }
 
     @Override
-    public Noticia getById(Long id) {
-        Optional<Noticia> article = noticiaRepository.findByIdOptional(id);
+    public Article getById(Long id) {
+        Optional<Article> article = articleRepository.findByIdOptional(id);
         if (article.isEmpty())
             throw new ApiException(404, "Não existe nenhuma notícia com o ID informado.");
 
@@ -71,55 +73,46 @@ public class NoticiaServiceImpl implements NoticiaService {
     }
 
     @Override
-    public NoticiaOutput getBySlug(String slug) {
-        Optional<Noticia> noticia = noticiaRepository.findBySlug(slug);
+    public ArticleOutput getBySlug(String slug) {
+        Optional<Article> article = articleRepository.findBySlug(slug);
 
-        // Noticia noticia = noticiaMapper.toModel(entity.get());
+        if (article.isEmpty())
+            throw new ApiException(404, "Não existe nenhuma notícia com a slug informada.");
 
-        return noticiaMapper.toCommentOutput(noticia.get());
+        return articleMapper.toArticleOutput(article.get());
     }
 
     @Transactional
     @Override
-    public Noticia create(MultipartInput body) {
-        // Mapeia JSON para um objeto.
-        ObjectMapper mapper = new ObjectMapper();
-        ArticleInput articleInput = null;
-
-        try {
-            articleInput = mapper.readValue(body.article, ArticleInput.class);
-        } catch (IOException e) {
-            throw new ApiException(401, "Erro ao processar informações.");
-        }
-
-        Noticia article = noticiaMapper.toModel(articleInput);
+    public Article create(InputStream coverImage, String coverImageName, @Valid ArticleInput articleInput) {
+        Article article = articleMapper.toModel(articleInput);
 
         if (!jwt.getSubject().equals(article.getAuthorId().toString()))
             throw new ApiException(400, "Erro ao processar o ID do autor.");
 
-        categoryService.getById(article.getCategoryId()); // Verifica se categoria existe (Vai ter exceção caso não
-                                                          // exista.)
+        // Verifica se categoria existe (Lança exceção caso não exista.)
+        categoryService.getById(article.getCategoryId());
 
         Slugify slugify = Slugify.builder().build();
         String slug = slugify.slugify(article.getTitulo());
         article.setSlug(slug);
 
-        if (noticiaRepository.findBySlug(article.getSlug()).isPresent())
+        if (articleRepository.findBySlug(article.getSlug()).isPresent())
             throw new ApiException(409, "Já existe uma notícia com o título informado.");
 
         // if (res.getStatus() != 200)
         // throw new ApiException(400, "Erro ao fazer upload da imagem.");
 
-        noticiaRepository.persist(article);
+        articleRepository.persist(article);
 
-        imageService.upload(new ImageInput(body.getFile(), body.getFileName(), article.getId().toString()));
+        imageService.upload(new ImageInput(coverImage, coverImageName, article.getId().toString()));
 
         return article;
     }
 
     @Transactional
     @Override
-    public Noticia edit(MultipartInput body) {
+    public Article edit(ArticleFormInput body) {
         ObjectMapper mapper = new ObjectMapper();
         ArticleInput articleInput = null;
 
@@ -129,10 +122,10 @@ public class NoticiaServiceImpl implements NoticiaService {
             throw new ApiException(401, "Erro ao processar informações.");
         }
 
-        Noticia article = noticiaMapper.toModel(articleInput);
+        Article article = articleMapper.toModel(articleInput);
 
         // Também verifica se a notícia existe (Exceção se não existir)
-        Noticia original = getById(article.getId());
+        Article original = getById(article.getId());
 
         // Verifica se o usuário é administrador
         boolean isAdmin = jwt.getGroups().contains("ADMIN");
@@ -154,7 +147,7 @@ public class NoticiaServiceImpl implements NoticiaService {
             String slug = slugify.slugify(article.getTitulo());
             article.setSlug(slug);
 
-            if (noticiaRepository.findBySlug(article.getSlug()).isPresent())
+            if (articleRepository.findBySlug(article.getSlug()).isPresent())
                 throw new ApiException(409, "Já existe uma notícia com o título informado.");
         }
 
@@ -165,12 +158,13 @@ public class NoticiaServiceImpl implements NoticiaService {
         // Manter a data de criação
         article.setCreatedAt(original.getCreatedAt());
 
-        article = noticiaRepository.getEntityManager().merge(article);
-        noticiaRepository.persist(article);
+        article = articleRepository.getEntityManager().merge(article);
+        articleRepository.persist(article);
 
         // Atualiza a imagem da capa, caso uma nova tenha sido enviada.
-        if (body.file != null)
-            imageService.update(new ImageInput(body.getFile(), body.getFileName(), article.getId().toString()));
+        // if (body.file != null)
+        // imageService.update(new ImageInput(body.getFile(), body.getFileName(),
+        // article.getId().toString()));
 
         return article;
     }
@@ -178,19 +172,19 @@ public class NoticiaServiceImpl implements NoticiaService {
     @Override
     public FeedOutput getFeedInfo(int pagesize, int pagenumber, String categorySlug) {
 
-        PanacheQuery<NoticiaFeedOutput> queryResult;
+        PanacheQuery<ArticleFeedOutput> queryResult;
 
         if (categorySlug != null) {
             Category category = categoryService.getBySlug(categorySlug);
-            queryResult = noticiaRepository.getAllFeedInfo(category.getId());
+            queryResult = articleRepository.getAllFeedInfo(category.getId());
 
         } else {
-            queryResult = noticiaRepository.getAllFeedInfo();
+            queryResult = articleRepository.getAllFeedInfo();
         }
 
-        PanacheQuery<NoticiaFeedOutput> page = queryResult.page(Page.of(pagenumber, pagesize));
+        PanacheQuery<ArticleFeedOutput> page = queryResult.page(Page.of(pagenumber, pagesize));
 
-        List<NoticiaFeedOutput> articles = page.list();
+        List<ArticleFeedOutput> articles = page.list();
 
         boolean hasMore = page.hasNextPage();
 
@@ -199,8 +193,8 @@ public class NoticiaServiceImpl implements NoticiaService {
     }
 
     @Override
-    public List<NoticiaFeedOutput> searchArticle(String query) {
-        return noticiaRepository.search(query);
+    public List<ArticleFeedOutput> searchArticle(String query) {
+        return articleRepository.search(query);
     }
 
 }

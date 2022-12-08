@@ -2,11 +2,12 @@ package dev.vicaw.model.comment;
 
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
-import dev.vicaw.model.comment.input.PostCommentInput;
+import dev.vicaw.model.comment.input.CommentEditInput;
+import dev.vicaw.model.comment.input.CommentInput;
 import dev.vicaw.model.comment.output.CommentOutput;
-import dev.vicaw.model.noticia.NoticiaMapper;
 import dev.vicaw.model.user.UserMapper;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public interface CommentMapper {
                                 .author(userMapper.toUserBasicOutput(comment.getAuthor()))
                                 .body(comment.getBody())
                                 .createdAt(comment.getCreatedAt())
+                                .updatedAt(comment.getUpdatedAt())
                                 .children(
                                                 comment.getChildren() != null
                                                                 ? comment.getChildren().stream().map(
@@ -36,5 +38,7 @@ public interface CommentMapper {
 
         List<CommentOutput> toCommentOutputList(List<Comment> comments);
 
-        Comment toModel(PostCommentInput input);
+        Comment toModel(CommentInput input);
+
+        void updateEntityFromInput(CommentEditInput input, @MappingTarget Comment entity);
 }

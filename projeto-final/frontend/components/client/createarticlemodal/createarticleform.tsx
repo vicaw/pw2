@@ -1,94 +1,27 @@
-"use client";
-import { FieldValues, useForm } from "react-hook-form";
-import {
-  ChangeEvent,
-  MouseEvent,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { AuthContext } from "../../../contexts/AuthContext";
-import { useGlobalModalContext } from "../../../contexts/ModalContext";
-import {
-  registrationRequest,
-  RegistrationRequestData,
-} from "../../../services/auth";
-import { CheckCircleIcon } from "@heroicons/react/20/solid";
+'use client';
+import { FieldValues, useForm } from 'react-hook-form';
+import { ChangeEvent, MouseEvent, useContext, useEffect, useState } from 'react';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { useGlobalModalContext } from '../../../contexts/ModalContext';
 
-import Image from "next/image";
-import { CategoryType } from "../../../types/category";
-import { api } from "../../../services/api";
-import { AxiosError } from "axios";
-import { NoticiaType } from "../../../types/noticia";
-import { PhotoIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon } from '@heroicons/react/20/solid';
 
-const fetchCategories = async () => {
-  const categories: CategoryType[] = await fetch(
-    "http://localhost:8080/api/categories",
-    { cache: "force-cache", next: { revalidate: 60 } }
-  )
-    .then((res) => res.json())
-    .catch(() => {
-      [{}];
-    });
-  console.log("fetch menu categories");
+import Image from 'next/image';
+import { api } from '../../../services/axios/api';
+import { AxiosError } from 'axios';
 
-  return categories;
-};
-
-export type CreateArticleRequestData = {
-  id: string | null;
-  slug: string | null;
-  titulo: string;
-  subtitulo: string;
-  body: string;
-  chapeu_feed: string;
-  titulo_feed: string;
-  resumo_feed: string;
-  categoryId: string;
-  authorId: string;
-};
-
-async function createArticleRequest(data: FormData): Promise<any> {
-  try {
-    const res = await api.post(`http://localhost:8080/api/noticias`, data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    const dados = await res.data;
-    console.log(dados);
-    return dados;
-  } catch (err) {
-    const errors = err as AxiosError<any>;
-    throw errors?.response?.data.message;
-  }
-}
-
-async function editArticleRequest(data: FormData): Promise<any> {
-  console.log(data);
-  try {
-    const res = await api.put(`http://localhost:8080/api/noticias`, data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    const dados = await res.data;
-
-    return dados;
-  } catch (err) {
-    const errors = err as AxiosError<any>;
-    throw errors?.response?.data.message;
-  }
-}
+import { PhotoIcon } from '@heroicons/react/24/outline';
+import { getCategories } from '../../../services/CategoryServices';
+import Category from '../../../models/Category';
+import Article, { NewArticle } from '../../../models/Article';
 
 interface Props {
-  article?: NoticiaType;
+  article?: Article;
 }
 
 export default function CreateArticleForm({ article }: Props) {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<String | String[]>('');
   const [registred, SetRegistred] = useState(false);
 
   const { user } = useContext(AuthContext);
@@ -100,40 +33,38 @@ export default function CreateArticleForm({ article }: Props) {
     article ? `http://localhost:8081/images/articles/${article.id}` : null
   );
 
-  const [categories, setCategories] = useState<CategoryType[]>([]);
-  const [currentCategory, setCurrentCategory] = useState<
-    string | number | undefined
-  >(0);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [currentCategory, setCurrentCategory] = useState<string | number | undefined>(0);
 
-  async function getCategories() {
+  async function populateCategories() {
     setIsLoading(true);
-    await fetchCategories().then((c) => setCategories(c));
+    await getCategories().then((c) => setCategories(c));
     setIsLoading(false);
     setCurrentCategory(article?.category.id);
   }
 
   useEffect(() => {
-    getCategories();
+    populateCategories();
   }, []);
 
   const onFileUploadChange = (e: ChangeEvent<HTMLInputElement>) => {
     const fileInput = e.target;
 
     if (!fileInput.files) {
-      alert("No file was chosen");
+      alert('No file was chosen');
       return;
     }
 
     if (!fileInput.files || fileInput.files.length === 0) {
-      alert("Files list is empty");
+      alert('Files list is empty');
       return;
     }
 
     const file = fileInput.files[0];
 
     /** File validation */
-    if (!file.type.startsWith("image")) {
-      alert("Please select a valide image");
+    if (!file.type.startsWith('image')) {
+      alert('Please select a valide image');
       return;
     }
 
@@ -142,8 +73,8 @@ export default function CreateArticleForm({ article }: Props) {
     setPreviewUrl(URL.createObjectURL(file)); // we will use this to show the preview of the image
 
     /** Reset file input */
-    e.currentTarget.type = "text";
-    e.currentTarget.type = "file";
+    e.currentTarget.type = 'text';
+    e.currentTarget.type = 'file';
   };
 
   const onCancelFile = (e: MouseEvent<HTMLButtonElement>) => {
@@ -156,25 +87,24 @@ export default function CreateArticleForm({ article }: Props) {
   };
 
   async function handleRegistration(data: FieldValues) {
-    console.log("Slug: ");
+    console.log('Slug: ');
 
     if (!user) return;
 
     if (!file && !article) return;
 
-    let reqData = data as CreateArticleRequestData;
+    let reqData = data as NewArticle;
     reqData.authorId = user.id;
-    reqData.id = article ? article.id : null;
-    reqData.slug = article ? article.slug : null;
 
     var formData = new FormData();
     if (file) {
-      formData.append("file", file);
-      formData.append("fileName", file.name);
+      formData.append('file', file);
+      formData.append('fileName', file.name);
     }
-    formData.append("article", JSON.stringify(reqData));
+    formData.append('article', JSON.stringify(reqData));
 
     try {
+      setError('');
       setIsLoading(true);
       const res = !article
         ? await createArticleRequest(formData)
@@ -183,7 +113,6 @@ export default function CreateArticleForm({ article }: Props) {
     } catch (err) {
       setError(err as string);
     } finally {
-      setError("");
       setIsLoading(false);
     }
   }
@@ -196,10 +125,7 @@ export default function CreateArticleForm({ article }: Props) {
           <span>Notícia publicada com sucesso.</span>
         </div>
       ) : (
-        <form
-          className="mt-8 space-y-6"
-          onSubmit={handleSubmit(handleRegistration)}
-        >
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(handleRegistration)}>
           <div className="tracking-tight flex flex-col gap-5">
             <div className="grid grid-cols-2 gap-5">
               <fieldset className="flex border p-4 text-gray-600 text-sm text-left rounded-sm">
@@ -220,9 +146,7 @@ export default function CreateArticleForm({ article }: Props) {
                     ) : (
                       <label className="flex flex-col items-center justify-center h-full py-3 transition-colors duration-150 cursor-pointer hover:text-red-600">
                         <PhotoIcon className="w-14 h-14" />
-                        <strong className="text-sm font-semibold">
-                          Selecione uma imagem
-                        </strong>
+                        <strong className="text-sm font-semibold">Selecione uma imagem</strong>
                         <input
                           className="block w-0 h-0"
                           name="file"
@@ -248,7 +172,7 @@ export default function CreateArticleForm({ article }: Props) {
                 <div>
                   <label htmlFor="chapeu">Chapéu</label>
                   <input
-                    {...register("chapeu_feed")}
+                    {...register('chapeu_feed')}
                     type="text"
                     disabled={isLoading}
                     required
@@ -259,7 +183,7 @@ export default function CreateArticleForm({ article }: Props) {
                 <div>
                   <label htmlFor="tituloFeed">Título</label>
                   <input
-                    {...register("titulo_feed")}
+                    {...register('titulo_feed')}
                     type="text"
                     disabled={isLoading}
                     defaultValue={article?.titulo_feed}
@@ -270,7 +194,7 @@ export default function CreateArticleForm({ article }: Props) {
                 <div>
                   <label htmlFor="resumo">Resumo</label>
                   <input
-                    {...register("resumo_feed")}
+                    {...register('resumo_feed')}
                     type="text"
                     disabled={isLoading}
                     defaultValue={article?.resumo_feed}
@@ -288,7 +212,7 @@ export default function CreateArticleForm({ article }: Props) {
                 <label htmlFor="category">Categoria</label>
 
                 <select
-                  {...register("categoryId", { required: true })}
+                  {...register('categoryId', { required: true })}
                   className="border relative block w-full px-3 py-2 rounded focus-visible:ring-red-600 focus:border-red-600 "
                   value={currentCategory}
                   defaultValue={currentCategory}
@@ -305,7 +229,7 @@ export default function CreateArticleForm({ article }: Props) {
               <div>
                 <label htmlFor="titulo">Título</label>
                 <input
-                  {...register("titulo")}
+                  {...register('titulo')}
                   type="text"
                   disabled={isLoading}
                   required
@@ -316,7 +240,7 @@ export default function CreateArticleForm({ article }: Props) {
               <div>
                 <label htmlFor="subtitulo">Subtítulo</label>
                 <textarea
-                  {...register("subtitulo")}
+                  {...register('subtitulo')}
                   disabled={isLoading}
                   required
                   defaultValue={article?.subtitulo}
@@ -326,7 +250,7 @@ export default function CreateArticleForm({ article }: Props) {
               <div>
                 <label htmlFor="body">Corpo</label>
                 <textarea
-                  {...register("body")}
+                  {...register('body')}
                   disabled={isLoading}
                   defaultValue={article?.body}
                   required
@@ -344,9 +268,9 @@ export default function CreateArticleForm({ article }: Props) {
             >
               {!isLoading ? (
                 !article ? (
-                  "PUBLICAR NOTÍCIA"
+                  'PUBLICAR NOTÍCIA'
                 ) : (
-                  "SALVAR MODIFICAÇÕES"
+                  'SALVAR MODIFICAÇÕES'
                 )
               ) : (
                 <svg
@@ -369,11 +293,9 @@ export default function CreateArticleForm({ article }: Props) {
             </button>
           </div>
 
-          {error !== "" ? (
+          {error !== '' ? (
             <div>
-              <span className="text-sm tracking-tighter text-red-600">
-                {error}
-              </span>
+              <span className="text-sm tracking-tighter text-red-600">{error}</span>
             </div>
           ) : null}
         </form>

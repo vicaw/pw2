@@ -1,9 +1,9 @@
 import moment from "moment";
 import Link from "next/link";
 import React from "react";
-import { NoticiaCardType } from "../../../types/noticia";
+import Article, { ArticleCard } from "../../../models/Article";
 
-function SearchArticleCard(noticia: NoticiaCardType) {
+function SearchArticleCard(noticia: ArticleCard) {
   return (
     <div className="grid grid-cols-12 gap-4 pt-8">
       <img

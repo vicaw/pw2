@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 @Builder
 @JsonInclude(Include.NON_NULL)
-public class UserBasicOutput {
+public class UserOutput {
 
     private Long id;
     private Role role;

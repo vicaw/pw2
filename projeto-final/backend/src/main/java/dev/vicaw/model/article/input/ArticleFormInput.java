@@ -1,4 +1,4 @@
-package dev.vicaw.model.noticia.input;
+package dev.vicaw.model.article.input;
 
 import java.io.InputStream;
 
@@ -10,17 +10,18 @@ import org.jboss.resteasy.annotations.providers.multipart.PartType;
 import lombok.Data;
 
 @Data
-public class MultipartInput {
+public class ArticleFormInput {
 
     @FormParam("file")
     @PartType(MediaType.APPLICATION_OCTET_STREAM)
-    public InputStream file;
+    public InputStream coverImage;
 
     @FormParam("fileName")
     @PartType(MediaType.TEXT_PLAIN)
-    public String fileName;
+    public String coverImageName;
 
+    // É convertido para JSON no resource.
     @FormParam("article")
-    @PartType(MediaType.APPLICATION_JSON)
+    @PartType(MediaType.TEXT_PLAIN)
     public String article;
 }

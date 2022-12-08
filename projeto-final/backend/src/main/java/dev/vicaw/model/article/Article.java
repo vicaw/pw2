@@ -1,4 +1,4 @@
-package dev.vicaw.model.noticia;
+package dev.vicaw.model.article;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,8 +34,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Noticias")
-public class Noticia {
+@Table(name = "articles")
+public class Article {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

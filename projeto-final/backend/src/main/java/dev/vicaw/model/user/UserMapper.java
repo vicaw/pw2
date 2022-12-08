@@ -6,7 +6,7 @@ import org.mapstruct.MappingTarget;
 
 import dev.vicaw.model.user.input.UserCreateInput;
 import dev.vicaw.model.user.input.UserLoginInput;
-import dev.vicaw.model.user.output.UserBasicOutput;
+import dev.vicaw.model.user.output.UserOutput;
 import dev.vicaw.model.user.output.UserRetrieveOutput;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public interface UserMapper {
 
     UserRetrieveOutput toModel(User entity);
 
-    UserBasicOutput toUserBasicOutput(User user);
+    UserOutput toUserBasicOutput(User user);
 
     User toModel(UserCreateInput input);
 

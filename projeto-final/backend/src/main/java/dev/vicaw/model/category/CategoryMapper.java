@@ -1,27 +1,15 @@
 package dev.vicaw.model.category;
 
-import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
-import dev.vicaw.model.category.input.CategoryCreateInput;
-
-import java.util.List;
+import dev.vicaw.model.category.input.CategoryInput;
 
 @Mapper(componentModel = "cdi")
 public interface CategoryMapper {
 
-    // List<Category> toModelList(List<Category> entities);
+    Category toModel(CategoryInput input);
 
-    // Category toModel(Category entity);
-
-    Category toModel(CategoryCreateInput input);
-
-    // @InheritInverseConfiguration(name = "toModel")
-    // Category toEntity(Category domain);
-
-    // void updateEntityFromModel(Category model, @MappingTarget Category entity);
-
-    // void updateModelFromEntity(Category entity, @MappingTarget Category model);
+    void updateEntityFromInput(CategoryInput input, @MappingTarget Category entity);
 
 }

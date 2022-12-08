@@ -15,7 +15,8 @@ import io.quarkus.panache.common.Page;
 import dev.vicaw.exception.ApiException;
 import dev.vicaw.model.comment.Comment;
 import dev.vicaw.model.comment.CommentMapper;
-import dev.vicaw.model.comment.input.PostCommentInput;
+import dev.vicaw.model.comment.input.CommentEditInput;
+import dev.vicaw.model.comment.input.CommentInput;
 import dev.vicaw.model.comment.output.ArticleCommentsOutput;
 import dev.vicaw.model.comment.output.CommentOutput;
 
@@ -39,28 +40,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ArticleCommentsOutput getArticleComments(Long id, int pagesize, int pagenumber) {
-        PanacheQuery<Comment> commentsWithoutParent = commentRepository
-                .find("noticia_id = ?1 AND parent_id IS NULL order by createdAt DESC", id);
-
-        PanacheQuery<Comment> page = commentsWithoutParent.page(Page.of(pagenumber, pagesize));
-
-        List<Comment> comments = page.list();
-
-        boolean hasMore = page.hasNextPage();
-
-        List<CommentOutput> commentsMapped = commentMapper.toCommentOutputList(comments);
-
-        return new ArticleCommentsOutput(hasMore, commentsMapped);
-    }
-
-    @Override
-    public long getArticleCommentsCount(Long id) {
-        long count = commentRepository.find("noticia_id", id).count();
-        return count;
-    }
-
-    @Override
     public CommentOutput getById(Long id) {
         Optional<Comment> comment = commentRepository.findByIdOptional(id);
         if (comment.isEmpty())
@@ -71,9 +50,9 @@ public class CommentServiceImpl implements CommentService {
         return commentMapped;
     }
 
-    @Transactional
     @Override
-    public CommentOutput create(PostCommentInput commentInput) {
+    @Transactional
+    public CommentOutput create(CommentInput commentInput) {
         if (!jwt.getSubject().equals(commentInput.getAuthorId().toString()))
             throw new ApiException(400, "Erro ao processar o ID do autor.");
 
@@ -88,12 +67,49 @@ public class CommentServiceImpl implements CommentService {
         return commentMapper.toCommentOutput(comment);
     }
 
-    @Transactional
     @Override
+    @Transactional
+    public CommentOutput update(Long id, CommentEditInput input) {
+        Optional<Comment> optional = commentRepository.findByIdOptional(id);
+
+        if (optional.isEmpty())
+            throw new ApiException(404, "Não existe nenhum comentário com o ID informado.");
+
+        Comment comment = optional.get();
+
+        commentMapper.updateEntityFromInput(input, comment);
+
+        return commentMapper.toCommentOutput(comment);
+    }
+
+    @Override
+    @Transactional
     public void delete(Long id) {
         boolean result = commentRepository.deleteById(id);
         if (!result)
-            throw new ApiException(400, "Não existe nenhum comentário com o ID informado.");
+            throw new ApiException(404, "Não existe nenhum comentário com o ID informado.");
+    }
+
+    @Override
+    public ArticleCommentsOutput getArticleComments(Long articleId, int pagesize, int pagenumber) {
+        PanacheQuery<Comment> commentsWithoutParent = commentRepository
+                .find("noticia_id = ?1 AND parent_id IS NULL order by createdAt DESC", articleId);
+
+        PanacheQuery<Comment> page = commentsWithoutParent.page(Page.of(pagenumber, pagesize));
+
+        List<Comment> comments = page.list();
+
+        boolean hasMore = page.hasNextPage();
+
+        List<CommentOutput> commentsMapped = commentMapper.toCommentOutputList(comments);
+
+        return new ArticleCommentsOutput(hasMore, commentsMapped);
+    }
+
+    @Override
+    public long getArticleCommentsCount(Long articleId) {
+        long count = commentRepository.find("noticia_id", articleId).count();
+        return count;
     }
 
     /*

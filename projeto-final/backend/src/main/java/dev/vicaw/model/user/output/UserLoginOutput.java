@@ -1,5 +1,6 @@
 package dev.vicaw.model.user.output;
 
+import dev.vicaw.model.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -7,5 +8,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class UserLoginOutput {
     String token;
-    UserRetrieveOutput user;
+    User user;
 }

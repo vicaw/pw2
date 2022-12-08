@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
+import dev.vicaw.model.article.Article;
 import dev.vicaw.model.comment.Comment;
-import dev.vicaw.model.noticia.Noticia;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -40,6 +40,7 @@ public class User {
 
     private String email;
 
+    @JsonIgnore
     private String password;
 
     private Role role;
@@ -58,5 +59,5 @@ public class User {
 
     @JsonIgnore
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-    private List<Noticia> articles;
+    private List<Article> articles;
 }

@@ -1,41 +1,34 @@
 "use client";
 import { FieldValues, useForm } from "react-hook-form";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { useGlobalModalContext } from "../../../contexts/ModalContext";
-import {
-  registrationRequest,
-  RegistrationRequestData,
-} from "../../../services/auth";
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
+import { NewUser } from "../../../models/User";
+import useAccountService from "../../../hooks/useAccountService";
 
 export default function RegistrationForm() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [registred, SetRegistred] = useState(false);
-
-  const { hideModal } = useGlobalModalContext();
-  const { setSession } = useContext(AuthContext);
+  const [registered, SetRegistered] = useState(false);
 
   const { register, handleSubmit } = useForm();
 
-  async function handleRegistration(data: FieldValues) {
-    setError("");
-    setIsLoading(true);
-    try {
-      const res = await registrationRequest(data as RegistrationRequestData);
-      setSession(res.token, res.user);
-      SetRegistred(true);
-    } catch (err) {
-      setError(err as string);
-    } finally {
-      setIsLoading(false);
+  const { isAuthenticated } = useContext(AuthContext);
+  const { loading, error, accountRegistrationRequest } = useAccountService();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log("criado e autenticado");
+      SetRegistered(true);
     }
+  }, [isAuthenticated]);
+
+  async function handleRegistration(data: FieldValues) {
+    await accountRegistrationRequest(data as NewUser);
   }
 
   return (
     <>
-      {registred ? (
+      {registered ? (
         <div className="mt-4">
           <CheckCircleIcon className="fill-green-700 w-16 h-16 m-auto" />
           <span>Conta cadastrada com sucesso.</span>
@@ -53,7 +46,7 @@ export default function RegistrationForm() {
                 id="name"
                 name="name"
                 type="name"
-                disabled={isLoading}
+                disabled={loading}
                 required
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-sm focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
               />
@@ -68,7 +61,7 @@ export default function RegistrationForm() {
                 name="email"
                 type="email"
                 required
-                disabled={isLoading}
+                disabled={loading}
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-sm focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
               />
             </div>
@@ -79,7 +72,7 @@ export default function RegistrationForm() {
                 id="password"
                 name="password"
                 type="password"
-                disabled={isLoading}
+                disabled={loading}
                 required
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-sm focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
               />
@@ -89,10 +82,10 @@ export default function RegistrationForm() {
           <div>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-extrabold rounded-sm text-white tracking-tighter bg-red-600 hover:bg-red-700 disabled:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
             >
-              {!isLoading ? (
+              {!loading ? (
                 "CADASTRAR"
               ) : (
                 <svg
@@ -115,7 +108,7 @@ export default function RegistrationForm() {
             </button>
           </div>
 
-          {error !== "" ? (
+          {error ? (
             <div>
               <span className="text-sm tracking-tighter text-red-600">
                 {error}

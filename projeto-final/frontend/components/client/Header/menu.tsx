@@ -1,39 +1,23 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import React, { useEffect, useRef, useState, useContext } from "react";
-import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/20/solid";
-import { CategoryType } from "../../../types/category";
-import { AuthContext } from "../../../contexts/AuthContext";
-import {
-  MODAL_TYPES,
-  useGlobalModalContext,
-} from "../../../contexts/ModalContext";
-import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
+import Link from 'next/link';
+import React, { useEffect, useRef, useState, useContext } from 'react';
+import { ChevronRightIcon, ChevronLeftIcon } from '@heroicons/react/20/solid';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { MODAL_TYPES, useGlobalModalContext } from '../../../contexts/ModalContext';
+import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import categoryService from '../../../services/CategoryServices';
+import Category from '../../../models/Category';
 
 //???????????????????????
-
-const fetchCategories = async () => {
-  const categories: CategoryType[] = await fetch(
-    "http://localhost:8080/api/categories",
-    { cache: "force-cache", next: { revalidate: 60 } }
-  )
-    .then((res) => res.json())
-    .catch(() => {
-      [{}];
-    });
-  console.log("fetch menu categories");
-
-  return categories;
-};
 
 function Menu() {
   const [layer, setLayer] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  const [categories, setCategories] = useState<CategoryType[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    fetchCategories().then((c) => setCategories(c));
+    categoryService.getCategories().then((categories) => setCategories(categories));
   }, []);
 
   const { signOut, isAuthenticated, user } = useContext(AuthContext);
@@ -55,12 +39,12 @@ function Menu() {
 
   useEffect(() => {
     if (isOpen) {
-      document.addEventListener("click", handleClickOutside);
+      document.addEventListener('click', handleClickOutside);
     } else {
-      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
     }
 
-    return () => document.removeEventListener("click", handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, [isOpen]);
 
   const nextLayer = () => {
@@ -78,17 +62,14 @@ function Menu() {
     <>
       <div
         className={
-          (isOpen ? "opacity-70" : "opacity-0") +
-          " h-screen w-screen right-0 top-0 transition-all bg-black fixed pointer-events-none"
+          (isOpen ? 'opacity-70' : 'opacity-0') +
+          ' h-screen w-screen right-0 top-0 transition-all bg-black fixed pointer-events-none'
         }
       />
 
       <menu ref={navRef}>
         <div className="h-full font-['Open_Sans'] text-sm font-bold text-white cursor-pointer select-none">
-          <div
-            className="h-full items-center flex"
-            onClick={() => setIsOpen(!isOpen)}
-          >
+          <div className="h-full items-center flex" onClick={() => setIsOpen(!isOpen)}>
             <div
               className="w-[20px] inline-block bg-white h-[2px] absolute z-[-1]
                        before:w-[20px] before:inline-block before:bg-white before:h-[2px] before:absolute before:top-[-6px]
@@ -100,14 +81,14 @@ function Menu() {
 
         <nav
           className={
-            (isOpen ? "left-0" : "left-[-272px]") +
-            " fixed transition-all top-0 w-[272px] h-screen bg-yellow-300 overflow-clip"
+            (isOpen ? 'left-0' : 'left-[-272px]') +
+            ' fixed transition-all top-0 w-[272px] h-screen bg-yellow-300 overflow-clip'
           }
         >
           <div
             className={
-              (layer == 0 ? "current " : "") +
-              "transition-all select-none h-screen bg-[#fafafa] p-5 absolute w-[272px] left-[-100%] [&.current]:left-0 flex flex-col justify-between"
+              (layer == 0 ? 'current ' : '') +
+              'transition-all select-none h-screen bg-[#fafafa] p-5 absolute w-[272px] left-[-100%] [&.current]:left-0 flex flex-col justify-between'
             }
           >
             <div
@@ -141,7 +122,7 @@ function Menu() {
                     </span>
                   </div>
                   <Link
-                    href={"/painel"}
+                    href={'/painel'}
                     className="flex mt-5 gap-3 hover:text-red-600  text-gray-700"
                   >
                     <AdjustmentsHorizontalIcon className="h-[18px] text-[#999]" />
@@ -203,8 +184,8 @@ function Menu() {
 
           <div
             className={
-              (layer == 1 ? "current " : "") +
-              "transition-all select-none h-screen bg-[#fafafa] divide-y absolute w-[272px]  text-white left-[100%] [&.current]:left-0 text-base"
+              (layer == 1 ? 'current ' : '') +
+              'transition-all select-none h-screen bg-[#fafafa] divide-y absolute w-[272px]  text-white left-[100%] [&.current]:left-0 text-base'
             }
           >
             <div

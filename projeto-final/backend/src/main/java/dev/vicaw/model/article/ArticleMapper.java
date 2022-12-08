@@ -1,20 +1,18 @@
-package dev.vicaw.model.noticia;
+package dev.vicaw.model.article;
 
-import dev.vicaw.model.noticia.output.NoticiaOutput;
-import dev.vicaw.model.noticia.input.ArticleInput;
-import dev.vicaw.model.noticia.output.NoticiaFeedOutput;
+import dev.vicaw.model.article.input.ArticleInput;
+import dev.vicaw.model.article.output.ArticleOutput;
 import dev.vicaw.model.user.UserMapper;
 
-import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "cdi")
-public interface NoticiaMapper {
+public interface ArticleMapper {
     UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
-    default NoticiaOutput toCommentOutput(Noticia noticia) {
-        return NoticiaOutput
+    default ArticleOutput toArticleOutput(Article noticia) {
+        return ArticleOutput
                 .builder()
                 .id(noticia.getId())
                 .author(userMapper.toUserBasicOutput(noticia.getAuthor()))
@@ -28,7 +26,7 @@ public interface NoticiaMapper {
                 .build();
     }
 
-    Noticia toModel(ArticleInput articleInput);
+    Article toModel(ArticleInput articleInput);
 
     // List<NoticiaFeed> toFeedOutputList(List<Noticia> entities);
 

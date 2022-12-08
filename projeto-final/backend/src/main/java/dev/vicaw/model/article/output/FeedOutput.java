@@ -1,4 +1,4 @@
-package dev.vicaw.model.noticia.output;
+package dev.vicaw.model.article.output;
 
 import java.util.List;
 
@@ -9,5 +9,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class FeedOutput {
     boolean hasMore;
-    List<NoticiaFeedOutput> articles;
+    List<ArticleFeedOutput> articles;
 }

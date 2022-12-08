@@ -13,7 +13,7 @@ type Response = {
 };
 
 const fetchFeed = async (page: number, query: URLSearchParams) => {
-  let url = `http://localhost:8080/api/noticias/search?page=${page}&pagesize=10`;
+  let url = `http://localhost:8080/api/articles/search?page=${page}&pagesize=10`;
 
   query.forEach((value, key) => {
     url = url.concat(`&${key}=${value}`);

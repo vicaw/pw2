@@ -1,25 +1,12 @@
-import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
-import { ParsedUrlQuery } from "querystring";
+import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
+import { ParsedUrlQuery } from 'querystring';
 
-import { NoticiaType } from "../../../../../../types/noticia";
-
-import parse from "html-react-parser";
-import moment from "moment";
-import { notFound } from "next/navigation";
-import CommentArea from "../../../../../../components/client/comments/commentarea";
-
-const fetchArticles = async (slug: string) => {
-  const data: NoticiaType = await fetch(
-    `http://localhost:8080/api/noticias/slugs/${slug}`,
-    { next: { revalidate: 600 } }
-  )
-    .then((res) => res.json())
-    .catch(() => {
-      null;
-    });
-
-  return data;
-};
+import parse from 'html-react-parser';
+import moment from 'moment';
+import { notFound } from 'next/navigation';
+import CommentArea from '../../../../../../components/client/comments/commentarea';
+import Article from '../../../../../../models/Article';
+import articleService from '../../../../../../services/ArticleServices';
 
 type PageProps = {
   params: {
@@ -29,29 +16,25 @@ type PageProps = {
   };
 };
 
-async function Noticia({
-  params: { categorySlug, articleSlug, articleId },
-}: PageProps) {
+async function Noticia({ params: { categorySlug, articleSlug, articleId } }: PageProps) {
   try {
-    const noticia: NoticiaType = await fetchArticles(articleSlug);
+    const noticia: Article = await articleService.getArticleBySlug(articleSlug);
 
     return (
       <main className="max-w-4xl m-auto grid grid-cols-1 divide-y divide-gray-300 pt-32">
         <div>
-          <h1 className="text-5xl font-bold tracking-tighter leading-[1.1]">
-            {noticia.titulo}
-          </h1>
+          <h1 className="text-5xl font-bold tracking-tighter leading-[1.1]">{noticia?.titulo}</h1>
           <h2 className="mt-6 text-xl text-gray-600 tracking-tight mr-6 leading-[1.5]">
-            {noticia.subtitulo}
+            {noticia?.subtitulo}
           </h2>
           <div className="mt-10 mb-10 text-gray-600">
-            <p className="text-gray-700 font-bold">Por {noticia.author.name}</p>
+            <p className="text-gray-700 font-bold">Por {noticia?.author.name}</p>
             <p>
-              {moment(noticia.createdAt).format("DD/MM/YYYY HH[h]mm ")}
+              {moment(noticia?.createdAt).format('DD/MM/YYYY HH[h]mm ')}
 
-              {noticia.createdAt != noticia.updatedAt ? (
+              {noticia?.createdAt != noticia?.updatedAt ? (
                 <span className="before:content-['\B7']">
-                  {" Atualizado " + moment(noticia.updatedAt).fromNow()}
+                  {' Atualizado ' + moment(noticia.updatedAt).fromNow()}
                 </span>
               ) : null}
             </p>
@@ -78,8 +61,8 @@ async function Noticia({
 export default Noticia;
 
 export async function generateStaticParams() {
-  const res = await fetch("http://localhost:8080/api/noticias/");
-  const noticias: NoticiaType[] = await res.json();
+  const res = await fetch('http://localhost:8080/api/articles/');
+  const noticias: Article[] = await res.json();
 
   return noticias.map((noticia) => ({
     articleId: noticia.id,

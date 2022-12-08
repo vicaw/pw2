@@ -1,9 +1,9 @@
 "use client";
 
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useContext, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { AuthContext } from "../../../contexts/AuthContext";
+import { AuthContext, useAuthContext } from "../../../contexts/AuthContext";
 import { useGlobalModalContext } from "../../../contexts/ModalContext";
 import LoginForm from "./loginform";
 import RegistrationForm from "./registrationform";
@@ -11,16 +11,13 @@ import RegistrationForm from "./registrationform";
 export default function LoginModal() {
   const [registerMode, setRegisterMode] = useState(false);
 
-  const { isAuthenticated } = useContext(AuthContext);
-  const { hideModal } = useGlobalModalContext();
+  const { isAuthenticated } = useAuthContext();
 
-  const handleModalToggle = () => {
-    hideModal();
-  };
+  const { hideModal } = useGlobalModalContext();
 
   return (
     <Transition appear show={true} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={handleModalToggle}>
+      <Dialog as="div" className="relative z-10" onClose={hideModal}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"

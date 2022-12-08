@@ -1,28 +1,24 @@
 "use client";
-import { useForm } from "react-hook-form";
-import { useContext, useState } from "react";
-import { AuthContext } from "../../../contexts/AuthContext";
+import { useEffect } from "react";
+import { FieldValues, useForm } from "react-hook-form";
+import { useAuthContext } from "../../../contexts/AuthContext";
 import { useGlobalModalContext } from "../../../contexts/ModalContext";
+import useAccountService from "../../../hooks/useAccountService";
+import { SignInRequest } from "../../../models/Auth";
 
 export default function LoginForm() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const { signIn } = useContext(AuthContext);
-  const { hideModal } = useGlobalModalContext();
-
+  const { loading, error, accountSignInRequest } = useAccountService();
   const { register, handleSubmit } = useForm();
 
-  async function handleSignIn(data: any) {
-    setError("");
-    setIsLoading(true);
-    try {
-      await signIn(data);
-      hideModal();
-    } catch (err) {
-      setError(err as string);
-    }
-    setIsLoading(false);
+  const { isAuthenticated } = useAuthContext();
+  const { hideModal } = useGlobalModalContext();
+
+  useEffect(() => {
+    if (isAuthenticated) hideModal();
+  }, [isAuthenticated]);
+
+  async function handleSignIn(data: FieldValues) {
+    await accountSignInRequest(data as SignInRequest);
   }
 
   return (
@@ -39,7 +35,7 @@ export default function LoginForm() {
             type="email"
             autoComplete="email"
             required
-            disabled={isLoading}
+            disabled={loading}
             className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-sm focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
           />
         </div>
@@ -51,7 +47,7 @@ export default function LoginForm() {
             name="password"
             type="password"
             autoComplete="current-password"
-            disabled={isLoading}
+            disabled={loading}
             required
             className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-sm focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
           />
@@ -61,10 +57,10 @@ export default function LoginForm() {
       <div>
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={loading}
           className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-extrabold rounded-sm text-white tracking-tighter bg-red-600 hover:bg-red-700 disabled:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
         >
-          {!isLoading ? (
+          {!loading ? (
             "ENTRAR"
           ) : (
             <svg

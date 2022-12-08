@@ -1,4 +1,4 @@
-package dev.vicaw.model.noticia.output;
+package dev.vicaw.model.article.output;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NoticiaFeedOutput {
+public class ArticleFeedOutput {
     private Long id;
     private String slug;
     private String chapeu_feed;

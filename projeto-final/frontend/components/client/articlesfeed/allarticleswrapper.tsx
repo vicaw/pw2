@@ -1,19 +1,19 @@
 "use client";
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { NoticiaCardType } from "../../../types/noticia";
+import { ArticleCard } from "../../../models/Article";
 import NoticiaCard from "./articlecard";
 import ArticleCardSkeleton from "./articlecardskeleton";
 import ArticlesFeed from "./articlesfeed";
 
 type Response = {
   hasMore: boolean;
-  articles: NoticiaCardType[];
+  articles: ArticleCard[];
 };
 
 const fetchFeed = async (page: number, category?: string) => {
   const url = category
-    ? `http://localhost:8080/api/noticias/feedinfo?category=${category}&page=${page}&pagesize=10`
-    : `http://localhost:8080/api/noticias/feedinfo?page=${page}&pagesize=10`;
+    ? `http://localhost:8080/api/articles/feedinfo?category=${category}&page=${page}&pagesize=10`
+    : `http://localhost:8080/api/articles/feedinfo?page=${page}&pagesize=10`;
 
   const feedinfo: Response = await fetch(url)
     .then((res) => res.json())
@@ -29,7 +29,7 @@ interface Props {
   category?: string;
 }
 function AllArticlesWrapper({ category }: Props) {
-  const [articles, setArticles] = useState<NoticiaCardType[]>([]);
+  const [articles, setArticles] = useState<ArticleCard[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const hasMore = useRef(false);

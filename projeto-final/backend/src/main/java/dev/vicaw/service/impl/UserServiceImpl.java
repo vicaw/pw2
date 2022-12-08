@@ -61,13 +61,13 @@ public class UserServiceImpl implements UserService {
     public UserLoginOutput login(UserLoginInput loginInput) {
         Optional<User> entity = userRepository.findByEmail(loginInput.getEmail());
 
-        if (!entity.isPresent())
+        if (entity.isEmpty())
             throw new ApiException(401, "Seu usuário ou senha estão incorretos.");
 
-        if (!BcryptUtil.matches(loginInput.getPassword(), entity.get().getPassword()))
-            throw new ApiException(401, "Seu usuário ou senha estão incorretos.");
+        User user = entity.get();
 
-        UserRetrieveOutput user = userMapper.toModel(entity.get());
+        if (!BcryptUtil.matches(loginInput.getPassword(), user.getPassword()))
+            throw new ApiException(401, "Seu usuário ou senha estão incorretos.");
 
         String token = Jwt
                 .issuer("http://localhost:8080")

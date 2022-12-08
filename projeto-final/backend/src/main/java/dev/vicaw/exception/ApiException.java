@@ -1,8 +1,8 @@
 package dev.vicaw.exception;
 
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class ApiException extends RuntimeException {
 
     private final int code;

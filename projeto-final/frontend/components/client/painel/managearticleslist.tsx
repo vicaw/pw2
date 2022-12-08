@@ -21,8 +21,8 @@ type Response = {
 const fetchFeed = async (page: number, user: UserType) => {
   const url =
     user.role === "EDITOR"
-      ? `http://localhost:8080/api/noticias?authorId=${user.id}`
-      : `http://localhost:8080/api/noticias`;
+      ? `http://localhost:8080/api/articles?authorId=${user.id}`
+      : `http://localhost:8080/api/articles`;
 
   const feedinfo: NoticiaType[] = await fetch(url)
     .then((res) => res.json())

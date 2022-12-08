@@ -1,5 +1,6 @@
 package dev.vicaw.exception;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -18,8 +19,12 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
                     .build();
         }
 
+        if (exception instanceof WebApplicationException) {
+            return ((WebApplicationException) exception).getResponse();
+        }
+
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(new ErrorResponseBody(500, "Something unexpected happened. Try again"))
+                .entity(new ErrorResponseBody(500, "Algo inesperado aconteceu. Tente novamente."))
                 .build();
     }
 

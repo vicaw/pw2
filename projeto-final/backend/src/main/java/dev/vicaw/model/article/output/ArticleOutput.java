@@ -1,9 +1,9 @@
-package dev.vicaw.model.noticia.output;
+package dev.vicaw.model.article.output;
 
 import java.time.LocalDateTime;
 
 import dev.vicaw.model.category.Category;
-import dev.vicaw.model.user.output.UserBasicOutput;
+import dev.vicaw.model.user.output.UserOutput;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,13 +15,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NoticiaOutput {
+public class ArticleOutput {
     private Long id;
     private String titulo;
     private String subtitulo;
     private String body;
     private Category category;
-    private UserBasicOutput author;
+    private UserOutput author;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
