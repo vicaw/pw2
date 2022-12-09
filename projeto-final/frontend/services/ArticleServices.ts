@@ -55,7 +55,7 @@ async function getArticleFeed(page: number, category?: string): Promise<GetFeedR
     : `http://localhost:8080/api/articles/feedinfo?page=${page}&pagesize=10`;
 
   const response = await fetch(url, {
-    next: { revalidate: 0 },
+    next: { revalidate: 1 },
   });
   const data = await response.json();
 
@@ -76,7 +76,7 @@ async function getAllArticles(query?: URLSearchParams): Promise<Article[]> {
   });
 
   const response = await fetch(url, {
-    next: { revalidate: 0 },
+    next: { revalidate: 1 },
   });
   const data = await response.json();
 
@@ -89,7 +89,7 @@ async function getAllArticles(query?: URLSearchParams): Promise<Article[]> {
 
 async function getArticleBySlug(slug: string): Promise<Article> {
   const response = await fetch(`http://localhost:8080/api/articles/slugs/${slug}`, {
-    next: { revalidate: 0 },
+    next: { revalidate: 1 },
   });
   const data = await response.json();
 
@@ -108,7 +108,7 @@ async function searchArticles(page: number, query: URLSearchParams): Promise<Get
   });
 
   const response = await fetch(url, {
-    next: { revalidate: 0 },
+    next: { revalidate: 1 },
   });
   const data = await response.json();
 

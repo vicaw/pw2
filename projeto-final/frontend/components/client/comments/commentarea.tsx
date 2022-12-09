@@ -23,7 +23,7 @@ export default function CommentArea({ articleId }: PageProps) {
 
   const { user, isAuthenticated } = useAuthContext();
 
-  const nextPage = useRef(1);
+  const nextPage = useRef(0);
   const hasMore = useRef(false);
 
   const { showModal } = useGlobalModalContext();

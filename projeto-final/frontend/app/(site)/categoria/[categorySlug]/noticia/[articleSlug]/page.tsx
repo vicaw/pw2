@@ -23,8 +23,6 @@ async function Noticia({ params: { categorySlug, articleSlug, articleId } }: Pag
     const noticia: Article = await articleService.getArticleBySlug(articleSlug);
     if (categorySlug !== noticia.category.slug) throw Error('Category does not match');
 
-    console.log(noticia?.createdAt + ' ' + noticia?.updatedAt);
-
     return (
       <main className="max-w-4xl m-auto grid grid-cols-1 divide-y divide-gray-300 pt-32">
         <div>

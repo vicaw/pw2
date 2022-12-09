@@ -15,7 +15,7 @@ function AllArticlesWrapper({ category }: Props) {
   const { loading, articleGetArticleFeed } = useArticleService();
 
   const hasMore = useRef(false);
-  const nextPage = useRef(1);
+  const nextPage = useRef(0);
   const firstLoad = useRef(true);
 
   const getMore = async () => {
