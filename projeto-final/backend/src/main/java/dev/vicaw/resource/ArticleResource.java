@@ -1,12 +1,11 @@
 package dev.vicaw.resource;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -19,13 +18,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dev.vicaw.exception.ApiException;
 import dev.vicaw.model.article.input.ArticleFormInput;
 import dev.vicaw.model.article.input.ArticleInput;
+import dev.vicaw.model.article.input.ArticleUpdateInput;
 import dev.vicaw.service.ArticleService;
 
 @Path("/api/articles")
@@ -33,6 +35,9 @@ public class ArticleResource {
 
     @Inject
     ArticleService articleService;
+
+    @Inject
+    JsonWebToken token;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -53,10 +58,12 @@ public class ArticleResource {
 
         try {
             articleInput = mapper.readValue(body.getArticle(), ArticleInput.class);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            return Response.status(Status.BAD_REQUEST).build();
+        } catch (JacksonException e) {
+            throw new ApiException(400, "Falha ao mapear objeto.");
         }
+
+        if (!token.getSubject().equals(articleInput.getAuthorId().toString()))
+            throw new ApiException(400, "O ID do autor não é o mesmo do usuário solicitante.");
 
         return Response.status(Status.OK)
                 .entity(articleService.create(body.getCoverImage(), body.getCoverImageName(), articleInput)).build();
@@ -75,7 +82,30 @@ public class ArticleResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public Response update(@PathParam("articleId") Long articleId, @MultipartForm ArticleFormInput body) {
-        return Response.status(Status.OK).entity(articleService.edit(body)).build();
+        // Mapeia JSON para um objeto.
+        ObjectMapper mapper = new ObjectMapper();
+        ArticleUpdateInput articleInput = null;
+
+        System.out.println(body.getArticle());
+
+        try {
+            articleInput = mapper.readValue(body.getArticle(), ArticleUpdateInput.class);
+        } catch (JacksonException e) {
+            throw new ApiException(400, "Falha ao mapear objeto.");
+        }
+
+        return Response.status(Status.OK)
+                .entity(articleService.update(articleId, body.getCoverImage(), body.getCoverImageName(), articleInput))
+                .build();
+    }
+
+    @Path("/{articleId}")
+    @DELETE
+    @RolesAllowed({ "EDITOR", "ADMIN" })
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response delete(@PathParam("articleId") Long articleId) {
+        articleService.delete(articleId);
+        return Response.status(Status.OK).build();
     }
 
     @Path("/slugs/{articleSlug}")
@@ -87,19 +117,20 @@ public class ArticleResource {
 
     @Path("/feedinfo")
     @GET
-    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFeedInfo(@DefaultValue("10") @QueryParam("pagesize") int pagesize,
-            @QueryParam("page") int page, @QueryParam("category") String categorySlug) {
+            @DefaultValue("1") @QueryParam("page") int page, @QueryParam("category") String categorySlug) {
         return Response.status(Status.OK).entity(articleService.getFeedInfo(pagesize, page, categorySlug)).build();
     }
 
     @Path("/search")
     @GET
-    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
-    public Response searchArticle(@QueryParam("q") String query) {
+    public Response searchArticle(
+            @QueryParam("q") @NotNull(message = "O termo de busca não foi informado.") @Size(min = 3, message = "O termo de busca deve ser maior que 3 caracteres") String query,
+            @DefaultValue("10") @QueryParam("pagesize") int pagesize,
+            @QueryParam("page") int page) {
         System.out.println(query);
-        return Response.status(Status.OK).entity(articleService.searchArticle(query)).build();
+        return Response.status(Status.OK).entity(articleService.searchArticle(query, pagesize, page)).build();
     }
 }

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import dev.vicaw.model.user.output.UserOutput;
+import dev.vicaw.model.user.output.UserProfileOutput;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +23,7 @@ public class CommentOutput {
     private Long id;
     private Long articleId;
     private Long parentId;
-    private UserOutput author;
+    private UserProfileOutput author;
     private String body;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

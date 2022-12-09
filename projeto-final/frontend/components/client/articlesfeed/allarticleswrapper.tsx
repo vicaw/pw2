@@ -1,49 +1,31 @@
-"use client";
-import React, { Suspense, useEffect, useRef, useState } from "react";
-import { ArticleCard } from "../../../models/Article";
-import NoticiaCard from "./articlecard";
-import ArticleCardSkeleton from "./articlecardskeleton";
-import ArticlesFeed from "./articlesfeed";
-
-type Response = {
-  hasMore: boolean;
-  articles: ArticleCard[];
-};
-
-const fetchFeed = async (page: number, category?: string) => {
-  const url = category
-    ? `http://localhost:8080/api/articles/feedinfo?category=${category}&page=${page}&pagesize=10`
-    : `http://localhost:8080/api/articles/feedinfo?page=${page}&pagesize=10`;
-
-  const feedinfo: Response = await fetch(url)
-    .then((res) => res.json())
-    .catch(() => {
-      [{}];
-    });
-
-  console.log(feedinfo);
-  return feedinfo;
-};
+'use client';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
+import useArticleService from '../../../hooks/useArticleService';
+import { ArticleCard } from '../../../models/Article';
+import NoticiaCard from './articlecard';
+import ArticleCardSkeleton from './articlecardskeleton';
+import ArticlesFeed from './articlesfeed';
 
 interface Props {
   category?: string;
 }
 function AllArticlesWrapper({ category }: Props) {
   const [articles, setArticles] = useState<ArticleCard[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const { loading, articleGetArticleFeed } = useArticleService();
 
   const hasMore = useRef(false);
   const nextPage = useRef(0);
+  const firstLoad = useRef(true);
 
   const getMore = async () => {
-    setIsLoading(true);
-    await fetchFeed(nextPage.current, category).then((data) => {
+    const data = await articleGetArticleFeed(nextPage.current, category);
+
+    if (data) {
       setArticles((prev) => [...prev, ...data.articles]);
       hasMore.current = data.hasMore;
       nextPage.current++;
-    });
-
-    setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -58,12 +40,12 @@ function AllArticlesWrapper({ category }: Props) {
         {hasMore.current ? (
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={loading}
             onClick={getMore}
             className="group relative shadow-md w-full flex justify-center p-5 border border-transparent font-bold rounded text-white tracking-tight bg-red-600 hover:bg-red-700 disabled:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
           >
-            {!isLoading ? (
-              "VEJA MAIS"
+            {!loading ? (
+              'VEJA MAIS'
             ) : (
               <svg
                 aria-hidden="true"

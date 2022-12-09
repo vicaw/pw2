@@ -1,19 +1,14 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import React from "react";
-import { useScrollPosition } from "../../../hooks/useScrollPosition";
-import { CategoryType } from "../../../types/category";
-import Menu from "./menu";
-import { usePathname } from "next/navigation";
-import SearchBar from "./searchbar";
+import Link from 'next/link';
+import React from 'react';
+import { useScrollPosition } from '../../../hooks/useScrollPosition';
+import Menu from './menu';
+import { usePathname } from 'next/navigation';
+import SearchBar from './searchbar';
 
 function classNames(...classes: String[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
-interface Props {
-  categories: CategoryType[];
+  return classes.filter(Boolean).join(' ');
 }
 
 function Header() {
@@ -22,8 +17,8 @@ function Header() {
   return (
     <header
       className={classNames(
-        scrollPosition > 0 ? "py-2 text-[2.3rem]" : "py-4 text-[2.5rem]",
-        "bg-red-700 fixed top-0 right-0 left-0 transition-spacing duration-200 px-5"
+        scrollPosition > 0 ? 'py-2 text-[2.3rem]' : 'py-4 text-[2.5rem]',
+        'bg-red-700 fixed top-0 right-0 left-0 transition-spacing duration-200 px-5'
       )}
     >
       <div className="flex items-center max-w-7xl m-auto place-content-between">

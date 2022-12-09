@@ -1,11 +1,11 @@
-"use client";
-import { FieldValues, useForm } from "react-hook-form";
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../../contexts/AuthContext";
-import { useGlobalModalContext } from "../../../contexts/ModalContext";
-import { CheckCircleIcon } from "@heroicons/react/20/solid";
-import { NewUser } from "../../../models/User";
-import useAccountService from "../../../hooks/useAccountService";
+'use client';
+import { FieldValues, useForm } from 'react-hook-form';
+import { useContext, useEffect, useState } from 'react';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { useGlobalModalContext } from '../../../contexts/ModalContext';
+import { CheckCircleIcon } from '@heroicons/react/20/solid';
+import { NewUser } from '../../../models/User';
+import useAccountService from '../../../hooks/useAccountService';
 
 export default function RegistrationForm() {
   const [registered, SetRegistered] = useState(false);
@@ -17,7 +17,7 @@ export default function RegistrationForm() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      console.log("criado e autenticado");
+      console.log('criado e autenticado');
       SetRegistered(true);
     }
   }, [isAuthenticated]);
@@ -34,15 +34,12 @@ export default function RegistrationForm() {
           <span>Conta cadastrada com sucesso.</span>
         </div>
       ) : (
-        <form
-          className="mt-8 space-y-6"
-          onSubmit={handleSubmit(handleRegistration)}
-        >
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(handleRegistration)}>
           <div className="flex flex-col gap-5 text-gray-600 text-sm text-left">
             <div>
               <label htmlFor="name">Nome completo</label>
               <input
-                {...register("name")}
+                {...register('name')}
                 id="name"
                 name="name"
                 type="name"
@@ -56,7 +53,7 @@ export default function RegistrationForm() {
                 E-mail
               </label>
               <input
-                {...register("email")}
+                {...register('email')}
                 id="email-address"
                 name="email"
                 type="email"
@@ -68,7 +65,7 @@ export default function RegistrationForm() {
             <div>
               <label htmlFor="password">Senha · 8 a 15 dígitos</label>
               <input
-                {...register("password")}
+                {...register('password')}
                 id="password"
                 name="password"
                 type="password"
@@ -86,7 +83,7 @@ export default function RegistrationForm() {
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-extrabold rounded-sm text-white tracking-tighter bg-red-600 hover:bg-red-700 disabled:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
             >
               {!loading ? (
-                "CADASTRAR"
+                'CADASTRAR'
               ) : (
                 <svg
                   aria-hidden="true"
@@ -108,11 +105,15 @@ export default function RegistrationForm() {
             </button>
           </div>
 
-          {error ? (
+          {error !== '' ? (
             <div>
-              <span className="text-sm tracking-tighter text-red-600">
-                {error}
-              </span>
+              {Array.isArray(error) ? (
+                error.map((e) => (
+                  <span className="block text-sm tracking-tighter text-red-600">{e}</span>
+                ))
+              ) : (
+                <span className="text-sm tracking-tighter text-red-600">{error}</span>
+              )}
             </div>
           ) : null}
         </form>

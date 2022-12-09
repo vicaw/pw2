@@ -2,8 +2,6 @@ package dev.vicaw.service;
 
 import java.util.List;
 
-import javax.validation.Valid;
-
 import dev.vicaw.model.category.Category;
 import dev.vicaw.model.category.input.CategoryInput;
 

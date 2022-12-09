@@ -1,58 +1,55 @@
-"use client";
+'use client';
 
-import moment from "moment";
-import { useContext, useEffect, useRef, useState } from "react";
-import { AuthContext } from "../../../contexts/AuthContext";
-import { UserType } from "../../../types";
-import { NoticiaCardType, NoticiaType } from "../../../types/noticia";
-import ManageArticlesListItem from "./managearticleslistitem";
+import { PlusIcon } from '@heroicons/react/20/solid';
+import { useEffect, useRef, useState } from 'react';
+import { useAuthContext } from '../../../contexts/AuthContext';
+import { MODAL_TYPES, useGlobalModalContext } from '../../../contexts/ModalContext';
+import useArticleService from '../../../hooks/useArticleService';
+import Article from '../../../models/Article';
+import ManageArticlesListItem from './managearticleslistitem';
 
 const columns = [
-  { id: 1, title: "Título", accessor: "titulo" },
-  { id: 2, title: "Última Edição", accessor: "updatedAt" },
-  { id: 3, title: "Publicação", accessor: "createdAt" },
+  { id: 1, title: 'Título', accessor: 'titulo' },
+  { id: 2, title: 'Última Edição', accessor: 'updatedAt' },
+  { id: 3, title: 'Publicação', accessor: 'createdAt' },
 ];
 
-type Response = {
-  hasMore: boolean;
-  articles: NoticiaCardType[];
-};
-
-const fetchFeed = async (page: number, user: UserType) => {
-  const url =
-    user.role === "EDITOR"
-      ? `http://localhost:8080/api/articles?authorId=${user.id}`
-      : `http://localhost:8080/api/articles`;
-
-  const feedinfo: NoticiaType[] = await fetch(url)
-    .then((res) => res.json())
-    .catch(() => {
-      [{}];
-    });
-
-  console.log(feedinfo);
-  return feedinfo;
-};
-
 export default function ManageArticlesList() {
-  const [articles, setArticles] = useState<NoticiaType[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { user } = useContext(AuthContext);
+  const [articles, setArticles] = useState<Article[]>([]);
 
-  const hasMore = useRef(false);
-  const nextPage = useRef(0);
+  const { user } = useAuthContext();
+  const { showModal } = useGlobalModalContext();
+
+  const { articleGetAllArticles } = useArticleService();
+
+  //const hasMore = useRef(false);
+  //const nextPage = useRef(0);
 
   const getMore = async () => {
-    if (!user) return;
+    if (!user || user.role === 'USER') return;
 
-    setIsLoading(true);
-    await fetchFeed(nextPage.current, user).then((data) => {
-      setArticles((prev) => [...prev, ...data]);
-      hasMore.current = false;
-      nextPage.current++;
-    });
+    const query = user.role === 'EDITOR' ? new URLSearchParams({ userId: user.id }) : undefined;
+    const data = await articleGetAllArticles(query);
 
-    setIsLoading(false);
+    if (data) {
+      const a = [...articles, ...data];
+
+      a.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+
+      setArticles(a);
+
+      //setArticles((prev) => [...prev, ...data]);
+    }
+
+    articles.sort;
+  };
+
+  const addArticle = (article: Article) => {
+    setArticles((articles) => [article, ...articles]);
+  };
+
+  const createModal = () => {
+    showModal(MODAL_TYPES.CREATEARTICLE_MODAL, { addArticle });
   };
 
   useEffect(() => {
@@ -60,22 +57,39 @@ export default function ManageArticlesList() {
   }, []);
 
   return (
-    <section className="containter bg-white p-4 rounded h-full">
-      <table className="containter w-full">
-        <thead>
-          <tr>
-            {columns.map((col) => (
-              <th key={col.id}>{col.title}</th>
+    <>
+      <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row justify-between">
+        <div className="mr-6">
+          <h1 className="text-4xl font-semibold mb-2">Notícias</h1>
+          <h2 className="text-gray-600 ml-0.5">Gerencie suas notícias</h2>
+        </div>
+        <div className="flex flex-wrap items-start justify-end -mb-3">
+          <button
+            onClick={createModal}
+            className="inline-flex px-5 py-3 text-white bg-red-600 hover:bg-red-700 focus:bg-red-700 rounded-md ml-6 mb-3"
+          >
+            <PlusIcon className="flex-shrink-0 h-6 w-6 text-white -ml-1 mr-2" />
+            Criar nova notícia
+          </button>
+        </div>
+      </div>
+      <section className="containter bg-white p-4 rounded h-full">
+        <table className="containter w-full">
+          <thead>
+            <tr>
+              {columns.map((col) => (
+                <th key={col.id}>{col.title}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {articles.map((article) => (
+              <ManageArticlesListItem key={article.id} article={article} />
             ))}
-          </tr>
-        </thead>
-        <tbody>
-          {articles.map((article) => (
-            <ManageArticlesListItem key={article.id} article={article} />
-          ))}
-        </tbody>
-      </table>
-    </section>
+          </tbody>
+        </table>
+      </section>
+    </>
   );
 }
 

@@ -1,77 +1,59 @@
-"use client";
-import { useSearchParams } from "next/navigation";
-import { ParsedUrlQuery } from "querystring";
-import React, { Suspense, useEffect, useRef, useState } from "react";
-import { NoticiaCardType } from "../../../types/noticia";
-import NoticiaCard from "../articlesfeed/articlecard";
-import ArticleCardSkeleton from "../articlesfeed/articlecardskeleton";
-import ArticlesFeed from "../articlesfeed/articlesfeed";
-
-type Response = {
-  //hasMore: boolean;
-  //articles: NoticiaCardType[];
-};
-
-const fetchFeed = async (page: number, query: URLSearchParams) => {
-  let url = `http://localhost:8080/api/articles/search?page=${page}&pagesize=10`;
-
-  query.forEach((value, key) => {
-    url = url.concat(`&${key}=${value}`);
-  });
-
-  const feedinfo: NoticiaCardType[] = await fetch(url)
-    .then((res) => res.json())
-    .catch(() => {
-      [{}];
-    });
-
-  console.log(feedinfo);
-  return feedinfo;
-};
+'use client';
+import { useSearchParams } from 'next/navigation';
+import { ParsedUrlQuery } from 'querystring';
+import React, { useEffect, useRef, useState } from 'react';
+import useArticleService from '../../../hooks/useArticleService';
+import { ArticleCard } from '../../../models/Article';
+import ArticlesFeed from '../articlesfeed/articlesfeed';
 
 interface Props {
   searchQuery?: ParsedUrlQuery;
 }
 function SearchArticlesWrapper({ searchQuery }: Props) {
-  const [articles, setArticles] = useState<NoticiaCardType[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [articles, setArticles] = useState<ArticleCard[]>([]);
+
+  const { loading, articleSearchArticles } = useArticleService();
+  const searchParams = useSearchParams();
 
   const hasMore = useRef(false);
   const nextPage = useRef(0);
 
-  const searchParams = useSearchParams();
-
   const getMore = async () => {
-    setIsLoading(true);
-    await fetchFeed(nextPage.current, searchParams).then((data) => {
-      setArticles((prev) => [...prev, ...data]);
-      //hasMore.current = data.hasMore;
+    // setArticles([]);
+    const data = await articleSearchArticles(nextPage.current, searchParams);
+    console.log(data);
+    if (data) {
+      setArticles((prev) => [...prev, ...data.articles]);
+      hasMore.current = data.hasMore;
       nextPage.current++;
-    });
-
-    setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    console.log("useef");
     setArticles([]);
+    hasMore.current = false;
+    nextPage.current = 0;
     getMore();
   }, [searchParams]);
 
   return (
     <div className="grid grid-cols-4">
       <div className="flex flex-col divide-y col-span-3 gap-8">
-        <ArticlesFeed articles={articles} />
+        {articles.length > 0 ? (
+          <ArticlesFeed articles={articles} />
+        ) : (
+          'Nenhum resultado encontrado.'
+        )}
 
         {hasMore.current ? (
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={loading}
             onClick={getMore}
             className="group relative shadow-md w-full flex justify-center p-5 border border-transparent font-bold rounded text-white tracking-tight bg-red-600 hover:bg-red-700 disabled:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
           >
-            {!isLoading ? (
-              "VEJA MAIS"
+            {!loading ? (
+              'VEJA MAIS'
             ) : (
               <svg
                 aria-hidden="true"

@@ -1,7 +1,13 @@
-import ManageArticles from "../../components/client/painel/managearticles";
+import ManageArticles from '../../components/client/painel/managearticles';
+import PainelHeader from '../../components/client/painel/painelheader';
 
 function Painel() {
-  return <ManageArticles />;
+  return (
+    <>
+      <PainelHeader />
+      <ManageArticles />
+    </>
+  );
 }
 
 export default Painel;

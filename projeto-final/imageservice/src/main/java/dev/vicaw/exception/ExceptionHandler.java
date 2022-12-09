@@ -5,8 +5,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import com.fasterxml.jackson.core.JacksonException;
-
 import lombok.Data;
 
 @Provider
@@ -18,12 +16,6 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
             ApiException e = (ApiException) exception;
             return Response.status(Response.Status.fromStatusCode(e.getCode()))
                     .entity(new ErrorResponseBody(e.getCode(), e.getMessage()))
-                    .build();
-        }
-
-        if (exception instanceof JacksonException) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new ErrorResponseBody(400, "Não foi possível processar algum dado enviado."))
                     .build();
         }
 

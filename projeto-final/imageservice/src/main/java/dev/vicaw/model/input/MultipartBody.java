@@ -1,4 +1,4 @@
-package dev.vicaw.model;
+package dev.vicaw.model.input;
 
 import java.io.InputStream;
 
@@ -19,5 +19,5 @@ public class MultipartBody {
 
     @FormParam("article_id")
     @PartType(MediaType.TEXT_PLAIN)
-    public String article_id;
+    public Long article_id;
 }

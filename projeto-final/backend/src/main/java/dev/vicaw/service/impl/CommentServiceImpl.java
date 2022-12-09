@@ -7,8 +7,6 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
-import org.eclipse.microprofile.jwt.JsonWebToken;
-
 import dev.vicaw.service.CommentService;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
@@ -31,9 +29,6 @@ public class CommentServiceImpl implements CommentService {
     @Inject
     CommentMapper commentMapper;
 
-    @Inject
-    JsonWebToken jwt;
-
     @Override
     public List<CommentOutput> list() {
         return commentMapper.toCommentOutputList(commentRepository.listAll());
@@ -53,9 +48,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentOutput create(CommentInput commentInput) {
-        if (!jwt.getSubject().equals(commentInput.getAuthorId().toString()))
-            throw new ApiException(400, "Erro ao processar o ID do autor.");
-
         if (commentInput.getParentId() != null) {
             CommentOutput parent = getById(commentInput.getParentId());
             if (parent.getArticleId() != commentInput.getArticleId())

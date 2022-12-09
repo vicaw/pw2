@@ -10,7 +10,7 @@ function ArticlesFeed({ articles }: Props) {
   return (
     <>
       {articles.map((article) => (
-        <NoticiaCard key={article.titulo_feed} {...article} />
+        <NoticiaCard key={article.tituloFeed} {...article} />
       ))}
     </>
   );

@@ -10,11 +10,11 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class UserLoginInput {
-    @Email
-    @NotNull
+    @Email(message = "E-mail mal formatado")
+    @NotNull(message = "Seu e-email não pode ficar em branco")
     private String email;
 
-    @NotNull
-    @Size(min = 8, max = 128)
+    @NotNull(message = "Sua senha não pode ficar em branco")
+    @Size(min = 8, max = 128, message = "Sua senha deve ter entre 8 e 128 caracteres")
     private String password;
 }

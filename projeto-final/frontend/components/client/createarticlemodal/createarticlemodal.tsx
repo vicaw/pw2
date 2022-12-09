@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useContext, useState } from "react";
-import { AuthContext } from "../../../contexts/AuthContext";
-import { useGlobalModalContext } from "../../../contexts/ModalContext";
-import CreateArticleForm from "./createarticleform";
+import { Dialog, Transition } from '@headlessui/react';
+import { Fragment, useContext, useState } from 'react';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { useGlobalModalContext } from '../../../contexts/ModalContext';
+import CreateArticleForm from './createarticleform';
 
 export default function CreateArticleModal() {
   const [registerMode, setRegisterMode] = useState(false);
@@ -48,9 +48,12 @@ export default function CreateArticleModal() {
                   as="h3"
                   className="text-2xl font-extrabold leading-6 text-red-600 tracking-tight"
                 >
-                  {!modalProps.article ? "CRIAR NOTÍCIA" : "EDITAR NOTÍCIA"}
+                  {!modalProps.article ? 'CRIAR NOTÍCIA' : 'EDITAR NOTÍCIA'}
                 </Dialog.Title>
-                <CreateArticleForm article={modalProps.article} />
+                <CreateArticleForm
+                  article={modalProps.article}
+                  addArticle={modalProps.addArticle}
+                />
               </Dialog.Panel>
             </Transition.Child>
           </div>

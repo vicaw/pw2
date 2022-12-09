@@ -1,6 +1,5 @@
 package dev.vicaw.repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -27,10 +26,10 @@ public class ArticleRepository implements PanacheRepository<Article> {
                 .project(ArticleFeedOutput.class);
     }
 
-    public List<ArticleFeedOutput> search(String query) {
+    public PanacheQuery<ArticleFeedOutput> search(String query) {
         return find(
                 "from Article n where CONCAT_WS(body, titulo, subtitulo, chapeu_feed, resumo_feed, titulo_feed) LIKE CONCAT('%',?1,'%') ORDER BY n.createdAt DESC",
-                query).project(ArticleFeedOutput.class).list();
+                query).project(ArticleFeedOutput.class);
     }
 
 }

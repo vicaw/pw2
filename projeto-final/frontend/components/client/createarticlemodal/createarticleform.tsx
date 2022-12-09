@@ -7,21 +7,18 @@ import { useGlobalModalContext } from '../../../contexts/ModalContext';
 import { CheckCircleIcon } from '@heroicons/react/20/solid';
 
 import Image from 'next/image';
-import { api } from '../../../services/axios/api';
-import { AxiosError } from 'axios';
-
 import { PhotoIcon } from '@heroicons/react/24/outline';
-import { getCategories } from '../../../services/CategoryServices';
 import Category from '../../../models/Category';
 import Article, { NewArticle } from '../../../models/Article';
+import categoryService from '../../../services/CategoryServices';
+import useArticleService from '../../../hooks/useArticleService';
 
 interface Props {
   article?: Article;
+  addArticle?: (article: Article) => void;
 }
 
-export default function CreateArticleForm({ article }: Props) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<String | String[]>('');
+export default function CreateArticleForm({ article, addArticle }: Props) {
   const [registred, SetRegistred] = useState(false);
 
   const { user } = useContext(AuthContext);
@@ -30,16 +27,16 @@ export default function CreateArticleForm({ article }: Props) {
 
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(
-    article ? `http://localhost:8081/images/articles/${article.id}` : null
+    article ? `http://localhost:8081/images/${article.coverImgName}` : null
   );
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [currentCategory, setCurrentCategory] = useState<string | number | undefined>(0);
 
+  const { articleCreateArticle, articleUpdateArticle, loading, error } = useArticleService();
+
   async function populateCategories() {
-    setIsLoading(true);
-    await getCategories().then((c) => setCategories(c));
-    setIsLoading(false);
+    await categoryService.getCategories().then((c) => setCategories(c));
     setCurrentCategory(article?.category.id);
   }
 
@@ -94,7 +91,7 @@ export default function CreateArticleForm({ article }: Props) {
     if (!file && !article) return;
 
     let reqData = data as NewArticle;
-    reqData.authorId = user.id;
+    if (!article) reqData.authorId = user.id;
 
     var formData = new FormData();
     if (file) {
@@ -104,16 +101,26 @@ export default function CreateArticleForm({ article }: Props) {
     formData.append('article', JSON.stringify(reqData));
 
     try {
-      setError('');
-      setIsLoading(true);
       const res = !article
-        ? await createArticleRequest(formData)
-        : await editArticleRequest(formData);
-      SetRegistred(true);
+        ? await articleCreateArticle(formData)
+        : await articleUpdateArticle(article.id, formData);
+      if (res) {
+        SetRegistred(true);
+
+        if (!article) {
+          res.category =
+            categories.find((c) => {
+              return c.id === res.categoryId;
+            }) || categories[0];
+
+          if (addArticle) {
+            addArticle(res);
+            console.log('ADDDED');
+          }
+        }
+      }
     } catch (err) {
-      setError(err as string);
-    } finally {
-      setIsLoading(false);
+      return;
     }
   }
 
@@ -172,21 +179,21 @@ export default function CreateArticleForm({ article }: Props) {
                 <div>
                   <label htmlFor="chapeu">Chapéu</label>
                   <input
-                    {...register('chapeu_feed')}
+                    {...register('chapeuFeed')}
                     type="text"
-                    disabled={isLoading}
+                    disabled={loading}
                     required
-                    defaultValue={article?.chapeu_feed}
+                    defaultValue={article?.chapeuFeed}
                     className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-sm focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
                   />
                 </div>
                 <div>
                   <label htmlFor="tituloFeed">Título</label>
                   <input
-                    {...register('titulo_feed')}
+                    {...register('tituloFeed')}
                     type="text"
-                    disabled={isLoading}
-                    defaultValue={article?.titulo_feed}
+                    disabled={loading}
+                    defaultValue={article?.tituloFeed}
                     required
                     className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-sm focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
                   />
@@ -194,10 +201,10 @@ export default function CreateArticleForm({ article }: Props) {
                 <div>
                   <label htmlFor="resumo">Resumo</label>
                   <input
-                    {...register('resumo_feed')}
+                    {...register('resumoFeed')}
                     type="text"
-                    disabled={isLoading}
-                    defaultValue={article?.resumo_feed}
+                    disabled={loading}
+                    defaultValue={article?.resumoFeed}
                     required
                     className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-sm focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
                   />
@@ -215,7 +222,6 @@ export default function CreateArticleForm({ article }: Props) {
                   {...register('categoryId', { required: true })}
                   className="border relative block w-full px-3 py-2 rounded focus-visible:ring-red-600 focus:border-red-600 "
                   value={currentCategory}
-                  defaultValue={currentCategory}
                   onChange={(e) => setCurrentCategory(e.currentTarget.value)}
                 >
                   {categories.map((category) => (
@@ -231,7 +237,7 @@ export default function CreateArticleForm({ article }: Props) {
                 <input
                   {...register('titulo')}
                   type="text"
-                  disabled={isLoading}
+                  disabled={loading}
                   required
                   defaultValue={article?.titulo}
                   className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-sm focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
@@ -241,7 +247,7 @@ export default function CreateArticleForm({ article }: Props) {
                 <label htmlFor="subtitulo">Subtítulo</label>
                 <textarea
                   {...register('subtitulo')}
-                  disabled={isLoading}
+                  disabled={loading}
                   required
                   defaultValue={article?.subtitulo}
                   className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-sm focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
@@ -251,7 +257,7 @@ export default function CreateArticleForm({ article }: Props) {
                 <label htmlFor="body">Corpo</label>
                 <textarea
                   {...register('body')}
-                  disabled={isLoading}
+                  disabled={loading}
                   defaultValue={article?.body}
                   required
                   className="min-h-[500px] appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-sm focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
@@ -263,10 +269,10 @@ export default function CreateArticleForm({ article }: Props) {
           <div>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-extrabold rounded-sm text-white tracking-tighter bg-red-600 hover:bg-red-700 disabled:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
             >
-              {!isLoading ? (
+              {!loading ? (
                 !article ? (
                   'PUBLICAR NOTÍCIA'
                 ) : (
@@ -295,7 +301,13 @@ export default function CreateArticleForm({ article }: Props) {
 
           {error !== '' ? (
             <div>
-              <span className="text-sm tracking-tighter text-red-600">{error}</span>
+              {Array.isArray(error) ? (
+                error.map((e) => (
+                  <span className="block text-sm tracking-tighter text-red-600">{e}</span>
+                ))
+              ) : (
+                <span className="text-sm tracking-tighter text-red-600">{error}</span>
+              )}
             </div>
           ) : null}
         </form>

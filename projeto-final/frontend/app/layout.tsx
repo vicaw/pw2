@@ -1,11 +1,7 @@
-import "../styles/globals.css";
-import Providers from "./providers";
+import '../styles/globals.css';
+import Providers from './providers';
 
-export default function SiteLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <html>
       <head />
@@ -15,5 +11,3 @@ export default function SiteLayout({
     </html>
   );
 }
-
-//<Header categories={categories} />

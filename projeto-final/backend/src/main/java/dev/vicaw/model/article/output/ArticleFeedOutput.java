@@ -17,9 +17,10 @@ import lombok.NoArgsConstructor;
 public class ArticleFeedOutput {
     private Long id;
     private String slug;
-    private String chapeu_feed;
-    private String titulo_feed;
-    private String resumo_feed;
+    private String coverImgName;
+    private String chapeuFeed;
+    private String tituloFeed;
+    private String resumoFeed;
     private LocalDateTime createdAt;
     private Category category;
 }

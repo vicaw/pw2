@@ -20,6 +20,9 @@ import javax.ws.rs.core.Response;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+import dev.vicaw.exception.ApiException;
 import dev.vicaw.model.comment.input.CommentEditInput;
 import dev.vicaw.model.comment.input.CommentInput;
 
@@ -32,6 +35,9 @@ public class CommentResource {
     @Inject
     CommentService commentService;
 
+    @Inject
+    JsonWebToken token;
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response list() {
@@ -42,6 +48,10 @@ public class CommentResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response save(@Valid CommentInput commentInput) {
+
+        if (!token.getSubject().equals(commentInput.getAuthorId().toString()))
+            throw new ApiException(400, "O ID do autor não é o mesmo do usuário solicitante.");
+
         return Response.status(Status.OK).entity(commentService.create(commentInput)).build();
     }
 
@@ -87,17 +97,4 @@ public class CommentResource {
     public Response getArticleCommentsCount(@PathParam("articleId") Long articleId) {
         return Response.status(Status.OK).entity(commentService.getArticleCommentsCount(articleId)).build();
     }
-
-    /*
-     * @Path("/{commentId}/children")
-     * 
-     * @GET
-     * 
-     * @Produces(MediaType.APPLICATION_JSON)
-     * public Response getChildren(@PathParam("commentId") Long commentId) {
-     * return
-     * Response.status(Status.OK).entity(commentService.getChildren(commentId)).
-     * build();
-     * }
-     */
 }

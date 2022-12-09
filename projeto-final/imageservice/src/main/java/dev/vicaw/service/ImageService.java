@@ -1,20 +1,33 @@
 package dev.vicaw.service;
 
+import java.util.List;
+import java.util.UUID;
+
 import dev.vicaw.model.Image;
-import dev.vicaw.model.MultipartBody;
+import dev.vicaw.model.input.MultipartBody;
+import dev.vicaw.model.output.ImageInfo;
 
 public interface ImageService {
-    public Image save(MultipartBody body);
+    public List<ImageInfo> listImageInfo();
 
-    public Image findByFileName(String fileName);
+    public List<ImageInfo> listImageInfoByArticleId(Long articleId);
 
-    public Image findByUuid(String uuid);
+    public ImageInfo getImageInfoById(UUID imageId);
 
-    public Image findByArticleId(Long articleId);
+    public ImageInfo getImageInfoByName(String imageName);
 
-    public Image findByArticleIdAndScale(Long articleId, int w, int h);
+    public ImageInfo save(MultipartBody body);
 
-    public Image findByFileNameAndScale(String name, int w, int h);
+    public ImageInfo update(MultipartBody body);
 
-    public Image update(MultipartBody body);
+    public void deleteAllArticleImages(Long articleId);
+
+    public void deleteImageByName(String name);
+
+    public Image getImageById(UUID id);
+
+    public Image getImageByName(String fileName);
+
+    public Image getImageByNameAndScale(String name, int w, int h);
+
 }

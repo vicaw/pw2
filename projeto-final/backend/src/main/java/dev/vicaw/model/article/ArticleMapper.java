@@ -1,13 +1,16 @@
 package dev.vicaw.model.article;
 
 import dev.vicaw.model.article.input.ArticleInput;
+import dev.vicaw.model.article.input.ArticleUpdateInput;
 import dev.vicaw.model.article.output.ArticleOutput;
 import dev.vicaw.model.user.UserMapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "cdi")
+@Mapper(componentModel = "cdi", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ArticleMapper {
     UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
@@ -15,12 +18,13 @@ public interface ArticleMapper {
         return ArticleOutput
                 .builder()
                 .id(noticia.getId())
-                .author(userMapper.toUserBasicOutput(noticia.getAuthor()))
+                .author(userMapper.toUserProfileOutput(noticia.getAuthor()))
                 .titulo(noticia.getTitulo())
                 .subtitulo(noticia.getSubtitulo())
                 .body(noticia.getBody())
                 .createdAt(noticia.getCreatedAt())
                 .updatedAt(noticia.getUpdatedAt())
+                .coverImgName(noticia.getCoverImgName())
                 .category(noticia.getCategory())
 
                 .build();
@@ -28,15 +32,8 @@ public interface ArticleMapper {
 
     Article toModel(ArticleInput articleInput);
 
-    // List<NoticiaFeed> toFeedOutputList(List<Noticia> entities);
+    void updateEntityFromInput(ArticleInput input, @MappingTarget Article entity);
 
-    // Noticia toModel(Noticia entity);
-
-    // @InheritInverseConfiguration(name = "toModel")
-    // Noticia toEntity(Noticia domain);
-
-    // void updateEntityFromModel(Noticia model, @MappingTarget Noticia entity);
-
-    // void updateModelFromEntity(Noticia entity, @MappingTarget Noticia model);
+    void updateEntityFromInput(ArticleUpdateInput input, @MappingTarget Article entity);
 
 }

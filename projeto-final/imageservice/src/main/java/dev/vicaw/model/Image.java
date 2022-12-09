@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -17,7 +18,10 @@ import javax.persistence.Table;
 
 import java.awt.image.BufferedImage;
 import java.awt.Color;
+
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,12 +48,18 @@ public class Image {
 
     private Long article_id;
 
+    @CreationTimestamp
+    public LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
     @Transient
     public static Image defaultImage() {
         try {
             ClassLoader classLoader = Image.class.getClassLoader();
             InputStream is = classLoader.getResourceAsStream("notfound.jpg");
-            Image image = new Image(null, is.readAllBytes(), "notfound.jpg", null);
+            Image image = new Image(null, is.readAllBytes(), "notfound.jpg", null, null, null);
             return image;
         } catch (IOException e) {
             return null;

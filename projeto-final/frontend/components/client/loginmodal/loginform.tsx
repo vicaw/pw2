@@ -1,10 +1,10 @@
-"use client";
-import { useEffect } from "react";
-import { FieldValues, useForm } from "react-hook-form";
-import { useAuthContext } from "../../../contexts/AuthContext";
-import { useGlobalModalContext } from "../../../contexts/ModalContext";
-import useAccountService from "../../../hooks/useAccountService";
-import { SignInRequest } from "../../../models/Auth";
+'use client';
+import { useEffect } from 'react';
+import { FieldValues, useForm } from 'react-hook-form';
+import { useAuthContext } from '../../../contexts/AuthContext';
+import { useGlobalModalContext } from '../../../contexts/ModalContext';
+import useAccountService from '../../../hooks/useAccountService';
+import { SignInRequest } from '../../../models/Auth';
 
 export default function LoginForm() {
   const { loading, error, accountSignInRequest } = useAccountService();
@@ -29,7 +29,7 @@ export default function LoginForm() {
             E-mail
           </label>
           <input
-            {...register("email")}
+            {...register('email')}
             id="email-address"
             name="email"
             type="email"
@@ -42,7 +42,7 @@ export default function LoginForm() {
         <div>
           <label htmlFor="password">Senha</label>
           <input
-            {...register("password")}
+            {...register('password')}
             id="password"
             name="password"
             type="password"
@@ -61,7 +61,7 @@ export default function LoginForm() {
           className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-extrabold rounded-sm text-white tracking-tighter bg-red-600 hover:bg-red-700 disabled:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
         >
           {!loading ? (
-            "ENTRAR"
+            'ENTRAR'
           ) : (
             <svg
               aria-hidden="true"
@@ -83,9 +83,15 @@ export default function LoginForm() {
         </button>
       </div>
 
-      {error !== "" ? (
+      {error !== '' ? (
         <div>
-          <span className="text-sm tracking-tighter text-red-600">{error}</span>
+          {Array.isArray(error) ? (
+            error.map((e) => (
+              <span className="block text-sm tracking-tighter text-red-600">{e}</span>
+            ))
+          ) : (
+            <span className="text-sm tracking-tighter text-red-600">{error}</span>
+          )}
         </div>
       ) : null}
     </form>

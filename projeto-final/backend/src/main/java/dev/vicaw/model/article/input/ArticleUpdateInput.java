@@ -13,7 +13,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ArticleInput {
+// ID do autor removido para evitar alterações.
+public class ArticleUpdateInput {
     @NotNull(message = "O título não pode ficar em branco")
     @Size(min = 3, max = 280, message = "O título deve ter entre 3 e 280 caracteres")
     private String titulo;
@@ -40,7 +41,4 @@ public class ArticleInput {
 
     @NotNull(message = "A notícia precisa estar vinculada à uma categoria.")
     private Long categoryId;
-
-    @NotNull(message = "A notícia precisa estar vinculada à um autor.")
-    private Long authorId;
 }

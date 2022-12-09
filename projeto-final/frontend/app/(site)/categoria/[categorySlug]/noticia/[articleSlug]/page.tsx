@@ -7,6 +7,8 @@ import { notFound } from 'next/navigation';
 import CommentArea from '../../../../../../components/client/comments/commentarea';
 import Article from '../../../../../../models/Article';
 import articleService from '../../../../../../services/ArticleServices';
+import Category from '../../../../../../models/Category';
+import categoryService from '../../../../../../services/CategoryServices';
 
 type PageProps = {
   params: {
@@ -19,6 +21,9 @@ type PageProps = {
 async function Noticia({ params: { categorySlug, articleSlug, articleId } }: PageProps) {
   try {
     const noticia: Article = await articleService.getArticleBySlug(articleSlug);
+    if (categorySlug !== noticia.category.slug) throw Error('Category does not match');
+
+    console.log(noticia?.createdAt + ' ' + noticia?.updatedAt);
 
     return (
       <main className="max-w-4xl m-auto grid grid-cols-1 divide-y divide-gray-300 pt-32">
@@ -32,7 +37,7 @@ async function Noticia({ params: { categorySlug, articleSlug, articleId } }: Pag
             <p>
               {moment(noticia?.createdAt).format('DD/MM/YYYY HH[h]mm ')}
 
-              {noticia?.createdAt != noticia?.updatedAt ? (
+              {noticia?.createdAt !== noticia?.updatedAt ? (
                 <span className="before:content-['\B7']">
                   {' Atualizado ' + moment(noticia.updatedAt).fromNow()}
                 </span>
@@ -44,7 +49,7 @@ async function Noticia({ params: { categorySlug, articleSlug, articleId } }: Pag
         <article className="max-w-2xl m-auto mt-10">
           <img
             className="container col-span-4"
-            src={`http://localhost:8081/images/articles/${noticia.id}`}
+            src={`http://localhost:8081/images/${noticia.coverImgName}`}
             alt=""
           />
           <div className="my-10">{parse(noticia.body)}</div>
@@ -61,10 +66,9 @@ async function Noticia({ params: { categorySlug, articleSlug, articleId } }: Pag
 export default Noticia;
 
 export async function generateStaticParams() {
-  const res = await fetch('http://localhost:8080/api/articles/');
-  const noticias: Article[] = await res.json();
+  const articles: Article[] = await articleService.getAllArticles();
 
-  return noticias.map((noticia) => ({
+  return articles.map((noticia) => ({
     articleId: noticia.id,
     articleSlug: noticia.slug,
     categorySlug: noticia.category.slug,

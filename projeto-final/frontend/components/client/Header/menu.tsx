@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import { ChevronRightIcon, ChevronLeftIcon } from '@heroicons/react/20/solid';
-import { AuthContext } from '../../../contexts/AuthContext';
+import { AuthContext, useAuthContext } from '../../../contexts/AuthContext';
 import { MODAL_TYPES, useGlobalModalContext } from '../../../contexts/ModalContext';
-import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import { AdjustmentsHorizontalIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline';
 import categoryService from '../../../services/CategoryServices';
 import Category from '../../../models/Category';
 
@@ -20,7 +20,7 @@ function Menu() {
     categoryService.getCategories().then((categories) => setCategories(categories));
   }, []);
 
-  const { signOut, isAuthenticated, user } = useContext(AuthContext);
+  const { signOut, isAuthenticated, user } = useAuthContext();
   const { showModal } = useGlobalModalContext();
 
   const loginModal = () => {
@@ -123,32 +123,19 @@ function Menu() {
                   </div>
                   <Link
                     href={'/painel'}
-                    className="flex mt-5 gap-3 hover:text-red-600  text-gray-700"
+                    className="group flex mt-5 gap-3 hover:text-red-700  text-gray-700"
                   >
-                    <AdjustmentsHorizontalIcon className="h-[18px] text-[#999]" />
+                    <AdjustmentsHorizontalIcon className="h-[18px] group-hover:text-red-700 text-[#999]" />
+
                     <span className="leading-none tracking-tighter text-base font-thin lowercase">
                       painel do {user?.role}
                     </span>
                   </Link>
                   <button
                     onClick={signOut}
-                    className="flex mt-5 gap-3 hover:text-red-600 hover:fill-red-600 text-gray-700"
+                    className="flex mt-5 gap-3 group hover:text-red-700 text-gray-700"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                    >
-                      <g fill="none" fillRule="evenodd">
-                        <path d="M-2-2h20v20H-2z"></path>
-                        <path
-                          fill="#999"
-                          fillRule="nonzero"
-                          d="M6.408 10.992l1.175 1.175L11.75 8 7.583 3.833 6.408 5.008l2.15 2.159H.5v1.666h8.058l-2.15 2.159zM13.833.5H2.167C1.242.5.5 1.25.5 2.167V5.5h1.667V2.167h11.666v11.666H2.167V10.5H.5v3.333c0 .917.742 1.667 1.667 1.667h11.666c.917 0 1.667-.75 1.667-1.667V2.167C15.5 1.25 14.75.5 13.833.5z"
-                        ></path>
-                      </g>
-                    </svg>
+                    <ArrowLeftOnRectangleIcon className="h-[18px]  text-[#999] group-hover:text-red-700" />
                     <span className="leading-none tracking-tighter text-base font-thin">
                       sair da conta
                     </span>

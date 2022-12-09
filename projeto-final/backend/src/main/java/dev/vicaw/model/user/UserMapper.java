@@ -1,36 +1,21 @@
 package dev.vicaw.model.user;
 
-import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 import dev.vicaw.model.user.input.UserCreateInput;
 import dev.vicaw.model.user.input.UserLoginInput;
-import dev.vicaw.model.user.output.UserOutput;
-import dev.vicaw.model.user.output.UserRetrieveOutput;
+import dev.vicaw.model.user.output.UserProfileOutput;
 
-import java.util.List;
-
-@Mapper(componentModel = "cdi")
+@Mapper(componentModel = "cdi", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
 
-    List<UserRetrieveOutput> toModelList(List<User> entities);
-
-    UserRetrieveOutput toModel(User entity);
-
-    UserOutput toUserBasicOutput(User user);
+    UserProfileOutput toUserProfileOutput(User user);
 
     User toModel(UserCreateInput input);
 
     UserLoginInput toLoginInput(User user);
 
     UserLoginInput toLoginInput(UserCreateInput createInput);
-
-    // @InheritInverseConfiguration(name = "toModel")
-    // UserEntity toEntity(User domain);
-
-    // void updateEntityFromModel(User model, @MappingTarget UserEntity entity);
-
-    // void updateModelFromEntity(UserEntity entity, @MappingTarget User model);
 
 }

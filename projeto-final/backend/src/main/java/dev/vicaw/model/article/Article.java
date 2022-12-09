@@ -29,11 +29,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 @Table(name = "articles")
 public class Article {
 
@@ -53,21 +55,27 @@ public class Article {
     @Column(columnDefinition = "TEXT")
     private String body;
 
-    private String chapeu_feed;
+    @Column(name = "cover_img_name")
+    private String coverImgName;
 
-    private String titulo_feed;
+    @Column(name = "chapeu_feed")
+    private String chapeuFeed;
 
-    private String resumo_feed;
+    @Column(name = "titulo_feed")
+    private String tituloFeed;
+
+    @Column(name = "resumo_feed")
+    private String resumoFeed;
 
     @JoinColumn(name = "category_id", insertable = false, updatable = false)
-    @ManyToOne(targetEntity = Category.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Category.class, fetch = FetchType.EAGER)
     private Category category;
 
     @Column(name = "category_id")
     private Long categoryId;
 
     @JoinColumn(name = "author_id", insertable = false, updatable = false)
-    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     private User author;
 
     @Column(name = "author_id")
