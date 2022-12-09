@@ -86,7 +86,7 @@ public class CommentResource {
     public Response getArticleComments(
             @PathParam("articleId") Long articleId,
             @DefaultValue("10") @QueryParam("pagesize") int pagesize,
-            @QueryParam("page") int page) {
+            @DefaultValue("1") @QueryParam("page") int page) {
         return Response.status(Status.OK).entity(commentService.getArticleComments(articleId, pagesize, page)).build();
     }
 

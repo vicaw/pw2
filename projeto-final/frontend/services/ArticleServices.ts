@@ -76,7 +76,7 @@ async function getAllArticles(query?: URLSearchParams): Promise<Article[]> {
   });
 
   const response = await fetch(url, {
-    next: { revalidate: 600 },
+    next: { revalidate: 0 },
   });
   const data = await response.json();
 
@@ -89,7 +89,7 @@ async function getAllArticles(query?: URLSearchParams): Promise<Article[]> {
 
 async function getArticleBySlug(slug: string): Promise<Article> {
   const response = await fetch(`http://localhost:8080/api/articles/slugs/${slug}`, {
-    next: { revalidate: 600 },
+    next: { revalidate: 0 },
   });
   const data = await response.json();
 

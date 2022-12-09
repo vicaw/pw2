@@ -16,7 +16,7 @@ function SearchArticlesWrapper({ searchQuery }: Props) {
   const searchParams = useSearchParams();
 
   const hasMore = useRef(false);
-  const nextPage = useRef(0);
+  const nextPage = useRef(1);
 
   const getMore = async () => {
     // setArticles([]);

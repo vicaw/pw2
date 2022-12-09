@@ -23,7 +23,7 @@ export default function CommentArea({ articleId }: PageProps) {
 
   const { user, isAuthenticated } = useAuthContext();
 
-  const nextPage = useRef(0);
+  const nextPage = useRef(1);
   const hasMore = useRef(false);
 
   const { showModal } = useGlobalModalContext();
@@ -76,16 +76,20 @@ export default function CommentArea({ articleId }: PageProps) {
     <section className="container max-w-2xl m-auto pt-10 mt-10 border-none text-gray-700 text-sm pb-[200px]">
       <div>
         <span
-          className={showComments ? 'text-lg mb-2 block' : 'text-2xl font-bold tracking-tight text-black mb-4 block'}
+          className={
+            showComments
+              ? 'text-lg mb-2 block'
+              : 'text-2xl font-bold tracking-tight text-black mb-4 block'
+          }
         >
           Comentários ({count})
         </span>
 
         {showComments && isAuthenticated ? (
           <p className="text-xs tracking-tight">
-            Os comentários são de responsabilidade exclusiva de seus autores e não representam a opinião deste site. Se
-            achar algo que viole os <b>termos de uso</b>, denuncie. Leia as <b>perguntas mais frequentes</b> para saber
-            o que é impróprio ou ilegal.
+            Os comentários são de responsabilidade exclusiva de seus autores e não representam a
+            opinião deste site. Se achar algo que viole os <b>termos de uso</b>, denuncie. Leia as{' '}
+            <b>perguntas mais frequentes</b> para saber o que é impróprio ou ilegal.
           </p>
         ) : null}
       </div>
@@ -95,7 +99,12 @@ export default function CommentArea({ articleId }: PageProps) {
           <CommentForm articleId={articleId} addComment={addComment} />
           <div className="flex flex-col divide-y">
             {comments?.map((comment: any) => (
-              <CommentCard key={comment.id} comment={comment} height={0} removeComment={removeComment} />
+              <CommentCard
+                key={comment.id}
+                comment={comment}
+                height={0}
+                removeComment={removeComment}
+              />
             ))}
           </div>
           {hasMore.current ? (

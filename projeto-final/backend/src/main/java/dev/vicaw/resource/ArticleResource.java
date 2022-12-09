@@ -129,7 +129,7 @@ public class ArticleResource {
     public Response searchArticle(
             @QueryParam("q") @NotNull(message = "O termo de busca não foi informado.") @Size(min = 3, message = "O termo de busca deve ser maior que 3 caracteres") String query,
             @DefaultValue("10") @QueryParam("pagesize") int pagesize,
-            @QueryParam("page") int page) {
+            @DefaultValue("1") @QueryParam("page") int page) {
         System.out.println(query);
         return Response.status(Status.OK).entity(articleService.searchArticle(query, pagesize, page)).build();
     }

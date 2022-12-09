@@ -3,7 +3,7 @@ import Category from '../models/Category';
 
 const getCategories = async (): Promise<Category[]> => {
   const response = await fetch(`http://localhost:8080/api/categories`, {
-    next: { revalidate: 600 },
+    next: { revalidate: 0 },
   });
   const data = await response.json();
 
@@ -16,7 +16,7 @@ const getCategories = async (): Promise<Category[]> => {
 async function checkCategoryBySlug(slug: string) {
   const response = await fetch(`http://localhost:8080/api/categories/slugs/${slug}`, {
     cache: 'force-cache',
-    next: { revalidate: 60 },
+    next: { revalidate: 0 },
   });
 
   const res = await response.json();
