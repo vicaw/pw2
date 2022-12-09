@@ -119,7 +119,7 @@ public class ArticleResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFeedInfo(@DefaultValue("10") @QueryParam("pagesize") int pagesize,
-            @DefaultValue("1") @QueryParam("page") int page, @QueryParam("category") String categorySlug) {
+            @DefaultValue("0") @QueryParam("page") int page, @QueryParam("category") String categorySlug) {
         return Response.status(Status.OK).entity(articleService.getFeedInfo(pagesize, page, categorySlug)).build();
     }
 
@@ -129,7 +129,7 @@ public class ArticleResource {
     public Response searchArticle(
             @QueryParam("q") @NotNull(message = "O termo de busca não foi informado.") @Size(min = 3, message = "O termo de busca deve ser maior que 3 caracteres") String query,
             @DefaultValue("10") @QueryParam("pagesize") int pagesize,
-            @DefaultValue("1") @QueryParam("page") int page) {
+            @DefaultValue("0") @QueryParam("page") int page) {
         System.out.println(query);
         return Response.status(Status.OK).entity(articleService.searchArticle(query, pagesize, page)).build();
     }
