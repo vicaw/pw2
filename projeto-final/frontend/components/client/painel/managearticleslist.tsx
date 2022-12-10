@@ -28,7 +28,10 @@ export default function ManageArticlesList() {
   const getMore = async () => {
     if (!user || user.role === 'USER') return;
 
-    const query = user.role === 'EDITOR' ? new URLSearchParams({ userId: user.id }) : undefined;
+    const query = user.role === 'EDITOR' ? new URLSearchParams({ authorId: user.id }) : undefined;
+    query?.forEach((value, key) => {
+      console.log(`${key}=${value}`);
+    });
     const data = await articleGetAllArticles(query);
 
     if (data) {

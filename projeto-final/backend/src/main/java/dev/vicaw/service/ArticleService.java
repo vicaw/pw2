@@ -13,7 +13,7 @@ import dev.vicaw.model.article.output.ArticleOutput;
 
 public interface ArticleService {
 
-    public List<Article> list(int authorId);
+    public List<Article> list(Long authorId);
 
     public Article getById(Long id);
 

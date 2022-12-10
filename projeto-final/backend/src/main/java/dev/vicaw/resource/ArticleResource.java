@@ -41,7 +41,8 @@ public class ArticleResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response list(@QueryParam("authorId") int authorId) {
+    public Response list(@QueryParam("authorId") Long authorId) {
+        System.out.println("AUtorid " + authorId);
         return Response.status(Status.OK).entity(articleService.list(authorId)).build();
     }
 

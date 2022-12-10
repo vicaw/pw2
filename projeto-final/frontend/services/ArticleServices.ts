@@ -72,8 +72,10 @@ async function getAllArticles(query?: URLSearchParams): Promise<Article[]> {
   let url = 'http://localhost:8080/api/articles?';
 
   query?.forEach((value, key) => {
-    url = url.concat(`&${key}=${value}`);
+    url = url.concat(`${key}=${value}`);
   });
+
+  console.log(url);
 
   const response = await fetch(url, {
     next: { revalidate: 1 },

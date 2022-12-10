@@ -56,8 +56,8 @@ public class ArticleServiceImpl implements ArticleService {
     JsonWebToken token;
 
     @Override
-    public List<Article> list(int authorId) {
-        if (authorId != 0) {
+    public List<Article> list(Long authorId) {
+        if (authorId != null) {
             return articleRepository.list("author_id", authorId);
         }
 
